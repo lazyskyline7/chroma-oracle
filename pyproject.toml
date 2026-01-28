@@ -3,7 +3,7 @@ name = "chroma-oracle"
 version = "0.1.0"
 description = "A colour sorting puzzle solver with mystery guessing capabilities"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "click>=7.1.2",
     "sty>=1.0.0b12",

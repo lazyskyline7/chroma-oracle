@@ -1,82 +1,90 @@
 # ChromaOracle 🔮
 
-A powerful CLI tool to solve colour sorting puzzle games (like Ball Sort Puzzle, Water Sort Puzzle) using Breadth-First Search (BFS) and Depth-First Search (DFS) algorithms. It includes a unique **Guesser** feature to crack levels with hidden mystery blocks.
+A powerful CLI tool to solve colour sorting puzzle games (like Ball Sort Puzzle, Water Sort Puzzle) using Breadth-First Search (BFS) and Depth-First Search (DFS) algorithms.
 
-This project is modernized to use **Python 3.14+** and **uv** for dependency management.
+It features a unique **Mystery Guesser** to crack levels with hidden "unseen" blocks 🕵️‍♀️.
 
-## 🎮 About the Game
+This project is modernized to use **Python 3.13+** and **uv** for blazing fast dependency management, and includes full **Docker** support.
 
-The game involves a collection of containers filled with coloured items.
-- Each container has a limited capacity (usually 4 items).
-- The goal is to sort the colours so that each container holds only one colour.
+## ✨ Features
 
-**Rules:**
-1. You can only move the **top-most** item.
-2. You can only place an item onto a matching colour or into an empty container.
-3. You cannot exceed a container's capacity.
+*   **Optimal Solving:** Uses BFS to find the shortest possible path to victory.
+*   **Fast Search:** Uses DFS to find *any* solution quickly for complex levels.
+*   **Mystery Solver:** Can deduce hidden colors (marked as `?` or `UNKNOWN`) by simulating all valid permutations.
+*   **Dockerized:** Run anywhere without installing Python locally.
 
 ## 🚀 Installation
 
-This project uses [uv](https://github.com/astral-sh/uv) for fast and reliable dependency management.
+### Option A: Docker (Recommended)
 
-1. **Install uv** (if not already installed):
-   ```bash
-   # MacOS / Linux
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
+No need to install Python or dependencies!
 
-2. **Clone the repository:**
-   ```bash
-   git clone https://github.com/lazyskyline7/chroma-oracle.git
-   cd chroma-oracle
-   ```
+1.  **Build the image:**
+    ```bash
+    docker build -t chroma-oracle .
+    ```
 
-3. **Sync Dependencies:**
-   ```bash
-   uv sync
-   ```
+### Option B: Local Development
+
+Requires [uv](https://github.com/astral-sh/uv).
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/lazyskyline7/chroma-oracle.git
+    cd chroma-oracle
+    ```
+
+2.  **Sync Dependencies:**
+    ```bash
+    uv sync
+    ```
 
 ## 🛠️ Usage
 
-### 1. Solve a Known Level
-If you know the colors of all items in the puzzle, create a JSON file (see [Input Format](#input-format)) and run:
+### 1. Standard Solver 🧩
+Solve a level where all colors are known.
 
+**Docker:**
 ```bash
-uv run python -m solver path/to/level.json
+docker run --rm chroma-oracle levels/simple_shows_differences.json
 ```
 
-**Options:**
-- `-a, --algorithm [BFS|DFS]`: Choose search algorithm (Default: BFS).
-  - `BFS`: Finds the **shortest** solution (optimal) but uses more memory.
-  - `DFS`: Finds **a** solution quickly, but it might not be the shortest.
-- `--verbose`: Enable detailed logging.
-
-**Example:**
+**Local:**
 ```bash
 uv run python -m solver levels/simple_shows_differences.json
 ```
 
-### 2. Solve a Mystery Level (Hidden Colors)
-Some levels have hidden items (denoted by `?` or `UNKNOWN`). Use the guesser tool to find a valid color configuration:
+**Options:**
+- `-a, --algorithm [BFS|DFS]`: Choose algorithm (Default: BFS).
+- `--verbose`: Enable debug logging.
 
-1. Create a JSON file using `"UNKNOWN"` for hidden items.
-2. Run the guesser:
-   ```bash
-   uv run python -m solver.guess levels/mystery.json DFS
-   ```
-3. If a solution is found, it will be saved as `levels/mystery.json.solved_X.json`. Run the standard solver on this generated file to see the steps.
+### 2. Mystery Guesser 🕵️‍♂️
+Crack levels with hidden blocks (`UNKNOWN` or `?` in the JSON file).
+
+**Docker:**
+```bash
+# Just add 'guess' before the file path!
+docker run --rm chroma-oracle guess levels/mystery.json DFS
+```
+
+**Local:**
+```bash
+uv run python -m solver.guess levels/mystery.json DFS
+```
+
+*If a solution is found, it will be saved as `levels/mystery.json.solved_X.json`. You can then run the Standard Solver on this file to see the moves.*
 
 ## 📄 Input Format
 
 Levels are defined in JSON files as a list of lists.
 - **Order:** Items are listed from **BOTTOM to TOP**.
-- **Colors:** Must match valid color names (see below).
+- **Colors:** Must match valid color names.
 
 **Example `level.json`:**
 ```json
 [
-    ["RED", "BLUE", "GREEN", "RED"],    // Container 1: Red at bottom, Red at top
-    ["BLUE", "RED", "GREEN", "BLUE"],   // Container 2
+    ["RED", "BLUE", "GREEN", "RED"],    // Container 1: Red at bottom
+    ["BLUE", "RED", "GREEN", "UNKNOWN"],// Container 2: Top item hidden
     [],                                 // Empty Container
     []                                  // Empty Container
 ]
@@ -84,6 +92,18 @@ Levels are defined in JSON files as a list of lists.
 
 **Supported Colors:**
 `RED`, `PINK`, `BROWN`, `GREEN`, `LIGHT_GREEN`, `DARK_GREEN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `DARK_BLUE`, `GREY` (use for White), `PURPLE`, `ORANGE`.
+
+## 🧠 Algorithms
+
+### Breadth-First Search (BFS)
+The BFS algorithm is designed to find the **optimal solution** (fewest moves).
+- **How it works:** It evaluates the starting pattern to find all possible moves, creating a "queue" of next patterns. It then evaluates each pattern layer by layer.
+- **Trade-off:** This guarantees the shortest path but can be slower and memory-intensive for very deep puzzles.
+
+### Depth-First Search (DFS)
+The DFS algorithm prioritizes **speed**.
+- **How it works:** It explores a single path of moves as far as possible (down the tree) before backtracking if it hits a dead end.
+- **Trade-off:** It finds *a* solution much faster than BFS, but the solution is often not the shortest (e.g., it might take 50 moves to do what BFS does in 20).
 
 ## 🧪 Development
 
@@ -93,17 +113,16 @@ To run the test suite:
 uv run pytest
 ```
 
-## 🧠 Algorithms
+## 🤝 Contributing
 
-### Breadth-First Search (BFS)
-Explores all neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.
-- **Pros:** Guarantees the shortest path (minimum moves).
-- **Cons:** Slower on complex levels; high memory usage.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-### Depth-First Search (DFS)
-Explores as far as possible along each branch before backtracking.
-- **Pros:** Very fast; low memory usage.
-- **Cons:** Solution is often not optimal (e.g., 50 moves instead of 20).
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## ⚠️ Disclaimer
-This project is for educational purposes only and bears no affiliation with any specific game apps on the App Store or Google Play.
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.

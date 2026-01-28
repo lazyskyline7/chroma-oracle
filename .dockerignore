@@ -1,0 +1,17 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+.tox
+.coverage
+.cache
+.pytest_cache
+.mypy_cache
+.vscode
+*.egg-info
+dist
+build
