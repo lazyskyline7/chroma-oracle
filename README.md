@@ -1,40 +1,109 @@
-# Colour Sort Solver
-[![Build Status](https://travis-ci.com/discorev/colour-puzzle-solver.svg?branch=main)](https://travis-ci.com/discorev/colour-puzzle-solver)
-[![codecov](https://codecov.io/gh/discorev/colour-puzzle-solver/branch/main/graph/badge.svg?token=IK9OVXNNEC)](https://codecov.io/gh/discorev/colour-puzzle-solver)
-[![CodeFactor](https://www.codefactor.io/repository/github/discorev/colour-puzzle-solver/badge)](https://www.codefactor.io/repository/github/discorev/colour-puzzle-solver)
+# ChromaOracle 🔮
 
-This project is to develop a solver for popular colour sorting puzzle games such as Ball Sort Puzzle ([App Store](https://apps.apple.com/app/ball-sort-puzzle/id1494648714) | [Google Play](https://play.google.com/store/apps/details?id=com.GMA.Ball.Sort.Puzzle)) and Water Sort Puzzle ([App Store](https://apps.apple.com/app/water-sort-puzzle/id1514542157) | [Android](https://play.google.com/store/apps/details?id=com.gma.water.sort.puzzle))
+A powerful CLI tool to solve colour sorting puzzle games (like Ball Sort Puzzle, Water Sort Puzzle) using Breadth-First Search (BFS) and Depth-First Search (DFS) algorithms. It includes a unique **Guesser** feature to crack levels with hidden mystery blocks.
 
+This project is modernized to use **Python 3.14+** and **uv** for dependency management.
 
-## About the game
-The game is based around a collection of containers that are filled with coloured items. Each container has a limited capacity (for the example games above, 4 items).
+## 🎮 About the Game
 
-The goal is to sort the colours such that all items for each unique colour are moved into the same container following a simple set of rules.
+The game involves a collection of containers filled with coloured items.
+- Each container has a limited capacity (usually 4 items).
+- The goal is to sort the colours so that each container holds only one colour.
 
-There is no time limit.
+**Rules:**
+1. You can only move the **top-most** item.
+2. You can only place an item onto a matching colour or into an empty container.
+3. You cannot exceed a container's capacity.
 
-### Rules
-* You can only move the top most colour from one container to another
-* You can only move a colour into a container if the top most colour is the same, unless the container is empty
-* You can only move a colour into a container that is not already at it's maximum capaicty
-* If there are multiple concurrent items of the same colour in the source contianer, all will be transfered to the destination container until it reaches it's maximum capacity.
+## 🚀 Installation
 
-## How does the solver work
-Given a starting pattern the solver can perform either a [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) or a [Depth-first search](https://en.wikipedia.org/wiki/Depth-first_search).
+This project uses [uv](https://github.com/astral-sh/uv) for fast and reliable dependency management.
 
-Once a valid solution is found, the search is completed and the final grid and all the moves taken to get there are output.
+1. **Install uv** (if not already installed):
+   ```bash
+   # MacOS / Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
 
-The starting pattern is provided as a JSON file. Some samples can be found in the levels folder.
+2. **Clone the repository:**
+   ```bash
+   git clone https://github.com/lazyskyline7/chroma-oracle.git
+   cd chroma-oracle
+   ```
 
-### Breadth-First Search
-The breadth first algorithm will always find the shortest path to a solution, sacraficing the time to find a solution in favour of ensuring the solution is optimal.
+3. **Sync Dependencies:**
+   ```bash
+   uv sync
+   ```
 
-The starting pattern is evaluated to find all possible moves and this forms a queue of next patterns. Then each pattern in the queue is evaluted one-by-one, finding all possible moves that have not already been visited and placing them into the queue. This is repeated until the queue is empty or a solution is found.
+## 🛠️ Usage
 
-### Depth-First Search
-The depth first algorithm will find a solution as quickly as possible. The trade-off here is that the solution may not be an optional solution, but it is found far quicker.
+### 1. Solve a Known Level
+If you know the colors of all items in the puzzle, create a JSON file (see [Input Format](#input-format)) and run:
 
-All possible moves are evaluted recursively following down the tree as quickly as possible until a solution is found.
+```bash
+uv run python -m solver path/to/level.json
+```
 
+**Options:**
+- `-a, --algorithm [BFS|DFS]`: Choose search algorithm (Default: BFS).
+  - `BFS`: Finds the **shortest** solution (optimal) but uses more memory.
+  - `DFS`: Finds **a** solution quickly, but it might not be the shortest.
+- `--verbose`: Enable detailed logging.
 
-**NOTICE:** This project is for educational purposes only and bears no affiliation with the linked games above.
+**Example:**
+```bash
+uv run python -m solver levels/simple_shows_differences.json
+```
+
+### 2. Solve a Mystery Level (Hidden Colors)
+Some levels have hidden items (denoted by `?` or `UNKNOWN`). Use the guesser tool to find a valid color configuration:
+
+1. Create a JSON file using `"UNKNOWN"` for hidden items.
+2. Run the guesser:
+   ```bash
+   uv run python -m solver.guess levels/mystery.json DFS
+   ```
+3. If a solution is found, it will be saved as `levels/mystery.json.solved_X.json`. Run the standard solver on this generated file to see the steps.
+
+## 📄 Input Format
+
+Levels are defined in JSON files as a list of lists.
+- **Order:** Items are listed from **BOTTOM to TOP**.
+- **Colors:** Must match valid color names (see below).
+
+**Example `level.json`:**
+```json
+[
+    ["RED", "BLUE", "GREEN", "RED"],    // Container 1: Red at bottom, Red at top
+    ["BLUE", "RED", "GREEN", "BLUE"],   // Container 2
+    [],                                 // Empty Container
+    []                                  // Empty Container
+]
+```
+
+**Supported Colors:**
+`RED`, `PINK`, `BROWN`, `GREEN`, `LIGHT_GREEN`, `DARK_GREEN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `DARK_BLUE`, `GREY` (use for White), `PURPLE`, `ORANGE`.
+
+## 🧪 Development
+
+To run the test suite:
+
+```bash
+uv run pytest
+```
+
+## 🧠 Algorithms
+
+### Breadth-First Search (BFS)
+Explores all neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.
+- **Pros:** Guarantees the shortest path (minimum moves).
+- **Cons:** Slower on complex levels; high memory usage.
+
+### Depth-First Search (DFS)
+Explores as far as possible along each branch before backtracking.
+- **Pros:** Very fast; low memory usage.
+- **Cons:** Solution is often not optimal (e.g., 50 moves instead of 20).
+
+## ⚠️ Disclaimer
+This project is for educational purposes only and bears no affiliation with any specific game apps on the App Store or Google Play.

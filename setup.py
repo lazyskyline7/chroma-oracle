@@ -20,13 +20,13 @@ def read_requirements(req):
 
 
 setup(
-    name="colour-puzzle-solver",
+    name="chroma-oracle",
     version=read_version(),
-    description="Colour puzzle solver",
+    description="Colour puzzle solver with mystery guessing",
     long_description=(pathlib.Path(__file__).parent / "README.md").read_text(),
     long_description_content_type="text/markdown",
     author="Ollie",
-    url="https://github.com/discorev/colour-puzzle-solver",
+    url="https://github.com/lazyskyline7/chroma-oracle",
     packages=find_packages(exclude=["tests.*", "tests"]),
     # Support Python 3.7 or greater
     python_requires=">=3.7, <=4.0, !=4.0",
