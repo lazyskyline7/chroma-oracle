@@ -78,15 +78,20 @@ def solve_mystery(puzzle_path, algorithm="BFS"):
 
     solved_count = 0
     
+    import os
+    output_dir = f"{puzzle_path}_solved"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     for i, perm in enumerate(unique_perms):
         # Construct candidate grid
         candidate_grid = copy.deepcopy(raw_grid)
         for idx, (r, c) in enumerate(unknown_indices):
             candidate_grid[r][c] = perm[idx]
-        
+
         try:
             collection = ContainerCollection(candidate_grid)
-            
+
             if algorithm == "BFS":
                 result = bfs(collection)
             else:
@@ -95,14 +100,14 @@ def solve_mystery(puzzle_path, algorithm="BFS"):
             if result:
                 print(f"Found solution for configuration #{i+1}")
                 solved_count += 1
-                
+
                 # Save it
-                out_filename = f"{puzzle_path}.solved_{solved_count}.json"
+                out_filename = f"{output_dir}/{solved_count}.json"
                 with open(out_filename, 'w') as out_f:
                     json.dump(candidate_grid, out_f, indent=4)
                 print(f"  Saved to {out_filename}")
                 print(f"  Assigned: {perm}")
-                
+
         except ValueError as e:
             # Only ignore "Invalid move" or "Invalid PUZZLE" errors that come from logic, 
             # but usually we want to see them if they are unexpected like "not a valid Colour".
