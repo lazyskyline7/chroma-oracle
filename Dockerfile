@@ -28,8 +28,8 @@ RUN chmod +x docker-entrypoint.sh
 
 # System Python used; no in-image virtualenv
 
-# Set the entrypoint to the custom script
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# Set the entrypoint to the custom script (invoke via sh to avoid exec permission issues)
+ENTRYPOINT ["sh", "/app/docker-entrypoint.sh"]
 
 # Default argument
 CMD ["--help"]

@@ -79,7 +79,8 @@ def solve_mystery(puzzle_path, algorithm="BFS"):
     solved_count = 0
     
     import os
-    output_dir = f"{puzzle_path}_solved"
+    base_name, _ = os.path.splitext(puzzle_path)
+    output_dir = f"{base_name}_solved"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
