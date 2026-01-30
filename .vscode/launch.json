@@ -14,7 +14,7 @@
             "args": [
                 "-a",
                 "dfs",
-                "levels/369.jpeg"
+                "levels/level9.json"
             ],
         },
         {
@@ -26,7 +26,7 @@
             "args": [
                 "-a",
                 "dfs",
-                "levels/369.jpeg"
+                "levels/level9.json"
             ],
             "env": {
                 "DEBUG": "true"

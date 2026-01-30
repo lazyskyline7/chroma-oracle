@@ -1,9 +1,0 @@
-black
-flake8
-mypy
-pylint
-rope
-pydocstyle
-pytest
-pytest-cov
-codecov

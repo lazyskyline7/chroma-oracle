@@ -137,3 +137,5 @@ cython_debug/
 
 # Mac specific
 .DS_Store
+
+.sisyphus

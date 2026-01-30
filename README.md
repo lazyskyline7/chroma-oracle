@@ -35,6 +35,18 @@ Use the provided wrapper script:
 This mounts `$(pwd)` into the container at `/app` and runs the command so
 outputs are written to your host tree by default.
 
+## CLI: match-steps
+
+Compare the first N moves of JSON solution files in a folder against a
+reference puzzle. Example:
+
+```
+chroma-oracle match-steps levels/level9_solved levels/level9.json 2 --algorithm BFS
+```
+
+This prints which files fully match the reference first N moves, partial
+matches, and differs.
+
 ### Option B: Local Development
 
 Requires [uv](https://github.com/astral-sh/uv).
@@ -63,10 +75,10 @@ Solve a level where all colors are known.
 docker run --rm chroma-oracle levels/simple_shows_differences.json
 ```
 
-**Local:**
+**Local (console script):**
 
 ```bash
-uv run python -m solver levels/simple_shows_differences.json
+uv run chroma-oracle levels/simple_shows_differences.json
 ```
 
 **Options:**
@@ -85,10 +97,10 @@ Crack levels with hidden blocks (`UNKNOWN` or `?` in the JSON file).
 docker run --rm chroma-oracle guess levels/mystery.json DFS
 ```
 
-**Local:**
+**Local (console script):**
 
 ```bash
-uv run python -m solver.guess levels/mystery.json DFS
+uv run chroma-oracle guess levels/mystery.json DFS
 ```
 
 _If a solution is found, it will be saved as `levels/mystery.json.solved_X.json`. You can then run the Standard Solver on this file to see the moves._
