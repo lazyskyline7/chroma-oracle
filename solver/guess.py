@@ -19,7 +19,7 @@ from solver.lib.colour import Colour
 from solver.lib.search import bfs, dfs
 
 
-def solve_mystery(puzzle_path, algorithm="BFS"):
+def solve_mystery(puzzle_path: str, algorithm: str = "BFS") -> None:
     """Attempt to solve a puzzle with UNKNOWN slots by trying candidates.
 
     Args:

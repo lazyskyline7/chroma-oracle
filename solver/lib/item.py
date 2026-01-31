@@ -1,5 +1,5 @@
 """Module representing a single coloured item."""
-from typing import Union
+
 
 from solver.lib.colour import Colour
 
@@ -7,7 +7,7 @@ from solver.lib.colour import Colour
 class Item:
     """A representation of a coloured thing that is compareable."""
 
-    def __init__(self, colour: Union[Colour, str]):
+    def __init__(self, colour: Colour | str):
         """Create a new coloured thing."""
         if isinstance(colour, Colour):
             self.colour = colour
@@ -35,7 +35,7 @@ class Item:
 
     def __str__(self):
         """Get a square of `colour` for printing."""
-        return self.colour.value + "\u25A0\x1b[39m"
+        return self.colour.value + "\u25a0\x1b[39m"
 
     def __repr__(self):
         """Get the colour's name."""

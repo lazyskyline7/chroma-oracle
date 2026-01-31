@@ -1,4 +1,5 @@
 """Route files to the correct loader for convert to a collection."""
+
 import pathlib
 
 from solver.lib import json2collection
@@ -12,4 +13,6 @@ def load(path: str, reject_invalid: bool) -> ContainerCollection:
         with file.open() as fh:
             return json2collection.load(fh, reject_invalid=reject_invalid)
     else:
-        raise ValueError(f"Unsupported file extension: {file.suffix}. Only .json is supported.")
+        raise ValueError(
+            f"Unsupported file extension: {file.suffix}. Only .json is supported."
+        )

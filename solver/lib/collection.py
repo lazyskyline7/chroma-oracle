@@ -1,9 +1,9 @@
 """Collection module."""
-from __future__ import annotations
-from typing import Union, List, Optional
 
-from solver.lib.move import Move
+from __future__ import annotations
+
 from solver.lib.container import Container
+from solver.lib.move import Move
 
 
 class ContainerCollection:
@@ -11,11 +11,11 @@ class ContainerCollection:
 
     def __init__(
         self,
-        data: Union[ContainerCollection, List[Container], List[List[str]]],
+        data: ContainerCollection | list[Container] | list[list[str]],
     ):
         """Construct a new collection from `data`."""
-        self.__unique_set: Optional[set] = None
-        self.__possible_moves: Optional[List[Move]] = None
+        self.__unique_set: set | None = None
+        self.__possible_moves: list[Move] | None = None
         if isinstance(data, list):
             self.data = tuple(Container(item) for item in data)
         elif isinstance(data, ContainerCollection):
@@ -32,7 +32,7 @@ class ContainerCollection:
         return all([container.is_solved for container in self.data])
 
     # work out all possible next moves:
-    def get_moves(self) -> List[Move]:
+    def get_moves(self) -> list[Move]:
         """Get a list of possible moves.
 
         Each move is a possible way to move a colour between two indexes
@@ -44,7 +44,7 @@ class ContainerCollection:
         # check for if this is cached
         if self.__possible_moves is not None:
             return self.__possible_moves
-        moves: List[Move] = []
+        moves: list[Move] = []
         for x in range(len(self)):
             # Skip fully solved containers
             if (
@@ -133,9 +133,7 @@ class ContainerCollection:
         if isinstance(other, ContainerCollection):
             return self._unique_set() == other._unique_set()
         if isinstance(other, list):
-            return self._unique_set() == set(
-                container.data for container in other
-            )
+            return self._unique_set() == set(container.data for container in other)
         return False
 
     def __ne__(self, other: object) -> bool:
@@ -145,8 +143,7 @@ class ContainerCollection:
     def __str__(self) -> str:
         """Printable representation of this collection."""
         return "\n".join(
-            str(i).rjust(2, " ") + ": " + str(self.data[i])
-            for i in range(len(self))
+            str(i).rjust(2, " ") + ": " + str(self.data[i]) for i in range(len(self))
         )
 
     def __repr__(self) -> str:

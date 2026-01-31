@@ -1,6 +1,7 @@
 """Module for handling the conversion of json input files to collections."""
+
 import json
-from typing import Dict, TextIO, List
+from typing import TextIO
 
 # from solver.lib.container import Container
 from solver.lib.collection import ContainerCollection
@@ -8,10 +9,10 @@ from solver.lib.collection import ContainerCollection
 
 def load(file: TextIO, *, reject_invalid: bool = False) -> ContainerCollection:
     """Load a json file into a `ContainerCollection`."""
-    content: List[List[str]] = json.load(file)
+    content: list[list[str]] = json.load(file)
 
     if reject_invalid:
-        colours: Dict[str, int] = dict()
+        colours: dict[str, int] = dict()
         for container_list in content:
             for item in container_list:
                 if item in colours:

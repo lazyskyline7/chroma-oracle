@@ -144,21 +144,62 @@ The DFS algorithm prioritizes **speed**.
 
 ## 🧪 Development
 
-To run the test suite:
+### Running Tests
 
 ```bash
 uv run pytest
 ```
 
-## 🤝 Contributing
+### Code Quality
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+**Lint and auto-fix with Ruff:**
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+```bash
+uv run ruff check --fix .
+```
+
+**Format code with Ruff:**
+
+```bash
+uv run ruff format .
+```
+
+**Type check with MyPy:**
+
+```bash
+uv run mypy solver
+```
+
+**Run all quality checks:**
+
+```bash
+uv run ruff check . && uv run ruff format --check . && uv run mypy solver
+```
+
+### Dependency Management
+
+**Add a runtime dependency:**
+
+```bash
+uv add <package-name>
+```
+
+**Add a development dependency:**
+
+```bash
+uv add --dev <package-name>
+```
+
+**Update all dependencies:**
+
+```bash
+uv lock --upgrade
+uv sync
+```
+
+All dependencies are defined in `pyproject.toml` and locked in 
+`uv.lock`. The old `requirements/` directory has been removed in 
+favor of modern PEP 735 dependency groups.
 
 ## 📝 License
 

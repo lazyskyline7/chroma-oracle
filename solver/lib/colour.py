@@ -1,6 +1,8 @@
 """Colours for use in the game."""
+
 from enum import Enum
-from sty import fg, Style, RgbFg
+
+from sty import RgbFg, Style, fg
 
 fg.li_green = Style(RgbFg(153, 255, 153))
 fg.li_blue = Style(RgbFg(102, 255, 255))

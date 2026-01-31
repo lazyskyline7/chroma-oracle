@@ -1,7 +1,10 @@
 """A container is a vessle with a limited capacity that holds items."""
+
 from __future__ import annotations
+
 import collections.abc
-from typing import cast, Any, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import Any, cast
 
 from solver.lib.item import Item
 
@@ -11,30 +14,24 @@ class Container:
 
     def __init__(
         self,
-        initial_content: Union[Sequence[Item], Container, Sequence[str]],
-        capacity: Optional[int] = None,
+        initial_content: Sequence[Item] | Container | Sequence[str],
+        capacity: int | None = None,
     ):
         """Create a container with `intial_content` and `capacity`."""
         self._capacity = capacity or 4
         # Ensure this is only ever set to the maximum size
-        self.__data: Tuple[Item, ...]
+        self.__data: tuple[Item, ...]
         if isinstance(initial_content, Container):
             self._capacity = capacity or initial_content.capacity
             self.__data = initial_content.data[:capacity]
         else:
             type_map = set(map(type, iter(initial_content)))
             if type_map == {Item}:
-                initial_content = cast(
-                    Sequence[Item], initial_content[:capacity]
-                )
+                initial_content = cast(Sequence[Item], initial_content[:capacity])
                 self.__data = tuple(initial_content)
             elif type_map == {str}:
-                initial_content = cast(
-                    Sequence[str], initial_content[:capacity]
-                )
-                self.__data = tuple(
-                    Item(value) for value in initial_content[:capacity]
-                )
+                initial_content = cast(Sequence[str], initial_content[:capacity])
+                self.__data = tuple(Item(value) for value in initial_content[:capacity])
             elif type_map == set():
                 self.__data = tuple()
             else:
@@ -62,7 +59,7 @@ class Container:
                     break
 
     @property
-    def data(self) -> Tuple[Item, ...]:
+    def data(self) -> tuple[Item, ...]:
         """Non-settable public exposure of the internal data."""
         return self.__data
 
@@ -106,7 +103,7 @@ class Container:
         return self.is_empty or (self.is_unique and self.is_full)
 
     @property
-    def head(self) -> Optional[Item]:
+    def head(self) -> Item | None:
         """Get the top most item in the container or None if empty."""
         if self.is_empty:
             return None
@@ -121,7 +118,7 @@ class Container:
         """
         return self.__num_matching_head
 
-    def test(self, item: Optional[Item]) -> bool:
+    def test(self, item: Item | None) -> bool:
         """Check if `item` can be put in this container."""
         if self.is_full or (not self.is_empty and self.__data[-1] != item):
             return False

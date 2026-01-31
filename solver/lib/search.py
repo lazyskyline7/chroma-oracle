@@ -1,6 +1,6 @@
 """Implementation of search algorithms."""
+
 import logging
-from typing import List, Optional, Tuple
 from dataclasses import dataclass
 
 from solver.lib.collection import ContainerCollection
@@ -12,21 +12,21 @@ class Option:
     """Represents an option in the graph of possible games."""
 
     collection: ContainerCollection
-    moves: Tuple[Move, ...]
+    moves: tuple[Move, ...]
 
 
-def bfs(root: ContainerCollection) -> Optional[Option]:
+def bfs(root: ContainerCollection) -> Option | None:
     """Perform a Breadth-first search to find an optimal solution."""
     # Ensure the search is required
     if root.is_solved:
         return Option(root, tuple())
-    queue: List[Option] = [
+    queue: list[Option] = [
         Option(root.after(move), (move,)) for move in root.get_moves()
     ]
     while len(queue) > 0:
         logging.debug(f"loop {len(queue[0].moves)} Options {len(queue)}")
-        next_queue: List[Option] = []
-        discovered: List[ContainerCollection] = []
+        next_queue: list[Option] = []
+        discovered: list[ContainerCollection] = []
         for option in queue:
             for move in option.collection.get_moves():
                 # If this move is the reverse of the previous move and the move
@@ -59,20 +59,18 @@ def bfs(root: ContainerCollection) -> Optional[Option]:
     return None
 
 
-def dfs(root: ContainerCollection) -> Optional[Option]:
+def dfs(root: ContainerCollection) -> Option | None:
     """Perform a depth-first search to find a solution."""
     # Ensure the search is required
     if root.is_solved:
         return Option(root, tuple())
 
-    visited: List[ContainerCollection] = []
+    visited: list[ContainerCollection] = []
     # Call the recursive function
     return _dfs(visited, Option(root, tuple()))
 
 
-def _dfs(
-    visited: List[ContainerCollection], option: Option
-) -> Optional[Option]:
+def _dfs(visited: list[ContainerCollection], option: Option) -> Option | None:
     col = option.collection
     if col in visited:
         return None

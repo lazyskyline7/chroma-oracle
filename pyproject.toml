@@ -22,28 +22,56 @@ exclude = ["tests*", "tests"]
 [dependency-groups]
 dev = [
     "pytest>=6.0",
-    "flake8>=7.0.0",
-    "black>=24.0.0",
+    "ruff>=0.8.0",
     "mypy>=1.0.0",
     "types-setuptools",
 ]
 
-[tool.black]
-line-length = 80
-target-version = ['py313']
-include = '\.pyi?$'
-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.vscode
-    | \.mypy_cache
-    | env
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-)
-'''
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+exclude = [
+    ".eggs",
+    ".git",
+    ".venv",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+    "C901",   # too complex (let's be lenient)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__.py
+
+[tool.ruff.lint.isort]
+known-first-party = ["solver"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+
+[tool.mypy]
+check_untyped_defs = true
+ignore_missing_imports = true
