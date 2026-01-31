@@ -1,9 +1,11 @@
 """Test the collection module."""
+
 import random
 from unittest import TestCase
+
 from solver.lib.collection import ContainerCollection
-from solver.lib.container import Container
 from solver.lib.colour import Colour
+from solver.lib.container import Container
 from solver.lib.move import Move
 
 colours = list(Colour)
@@ -130,9 +132,7 @@ class TestContainerCollection(TestCase):
         )
         moves = coll.get_moves()
         self.assertEqual(len(moves), 1, "Only one move should be available")
-        self.assertSequenceEqual(
-            moves, [Move(0, 1)], "Empty set of moves expected"
-        )
+        self.assertSequenceEqual(moves, [Move(0, 1)], "Empty set of moves expected")
 
     def test_is_valid_from_unique_to_empty(self):
         """Test it's invalid to move from a unique to empty container."""

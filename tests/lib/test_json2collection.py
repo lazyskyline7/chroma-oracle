@@ -1,6 +1,8 @@
 """Tests for the json2collection module."""
+
 import pathlib
 from unittest import TestCase
+
 from solver.lib import json2collection
 from solver.lib.collection import ContainerCollection
 

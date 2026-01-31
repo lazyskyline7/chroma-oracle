@@ -1,8 +1,10 @@
 """Test the contianer module."""
-from unittest import TestCase, expectedFailure
+
+from unittest import TestCase
+
+from solver.lib.colour import Colour
 from solver.lib.container import Container
 from solver.lib.item import Item
-from solver.lib.colour import Colour
 
 
 class TestContainer(TestCase):
@@ -17,12 +19,8 @@ class TestContainer(TestCase):
         self.assertTrue(cont.is_unique, "An empty container is unique")
         self.assertTrue(cont.is_solved, "An empty container is solved")
         self.assertEqual(len(cont), 0, "An empty container has length 0")
-        self.assertTrue(
-            cont.test(Item(Colour.RED)), "Any colour should test true"
-        )
-        self.assertTrue(
-            cont.test(Item(Colour.BLUE)), "Any colour should test true"
-        )
+        self.assertTrue(cont.test(Item(Colour.RED)), "Any colour should test true")
+        self.assertTrue(cont.test(Item(Colour.BLUE)), "Any colour should test true")
         self.assertEqual(str(cont), "[    ]", "Empty collection")
         self.assertEqual(cont.__repr__(), "[]", "Empty collection")
 
@@ -125,9 +123,7 @@ class TestContainer(TestCase):
         cont = Container(["RED"], 1)
         self.assertTrue(cont.is_full, "The container is full")
 
-        self.assertFalse(
-            cont.add(Colour.RED), "Cannot add to a full container"
-        )
+        self.assertFalse(cont.add(Colour.RED), "Cannot add to a full container")
         self.assertTupleEqual(
             cont.data, (Colour.RED,), "The collection should be unchanged"
         )
@@ -141,17 +137,13 @@ class TestContainer(TestCase):
         self.assertTrue(cont.is_empty, "Container is now empty")
         self.assertEqual(len(target), 1, "Target now has the item")
         self.assertFalse(target.is_empty, "Target is no longer empty")
-        self.assertTupleEqual(
-            target.data, (Colour.RED,), "Target now has the red item"
-        )
+        self.assertTupleEqual(target.data, (Colour.RED,), "Target now has the red item")
 
     def test_container_pour_from_empty(self):
         """Check pouring from an empty container."""
         cont = Container([])
         target = Container([])
-        self.assertFalse(
-            cont.pour(target), "Cannot poour from an empty container"
-        )
+        self.assertFalse(cont.pour(target), "Cannot poour from an empty container")
 
     def test_container_pour_single_to_matching(self):
         """Check pouring a single item to an empty container."""
@@ -173,9 +165,7 @@ class TestContainer(TestCase):
         target = Container(["GREEN"])
         self.assertFalse(cont.pour(target), "Pour should fail.")
         self.assertEqual(len(cont), 1, "Container still has one item")
-        self.assertEqual(
-            cont.data, (Colour.RED,), "Container still has one red item"
-        )
+        self.assertEqual(cont.data, (Colour.RED,), "Container still has one red item")
         self.assertEqual(len(target), 1, "Target still has one item")
         self.assertTupleEqual(
             target.data, (Colour.GREEN,), "Target still only has a green item"
@@ -244,9 +234,7 @@ class TestContainer(TestCase):
         copy = cont.copy()
         self.assertEqual(cont, copy, "New container should equal the original")
         self.assertTrue(copy.add(Item(Colour.RED)), "Add should succeed")
-        self.assertNotEqual(
-            cont, copy, "The add should only affect one container"
-        )
+        self.assertNotEqual(cont, copy, "The add should only affect one container")
 
     def test_container_num_at_head(self):
         """Check the number of matches is initalised correctly."""
@@ -262,9 +250,7 @@ class TestContainer(TestCase):
         cont = Container(["GREEN", "RED", "GREEN"])
         self.assertEqual(cont.num_matching_head, 1, "No consecutive colours")
         cont.add(Colour.GREEN)
-        self.assertEqual(
-            cont.num_matching_head, 2, "Two consecutive colours after add"
-        )
+        self.assertEqual(cont.num_matching_head, 2, "Two consecutive colours after add")
 
     def test_container_num_at_head_after_pour_single_in_src(self):
         """After pour check the number of matches is in both src and dest.

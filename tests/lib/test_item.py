@@ -1,7 +1,9 @@
 """Tests for the item module."""
+
 from unittest import TestCase
-from solver.lib.item import Item
+
 from solver.lib.colour import Colour
+from solver.lib.item import Item
 
 
 class TestItem(TestCase):
@@ -11,29 +13,21 @@ class TestItem(TestCase):
         """Test Item initalised from the Colour enum."""
         item = Item(Colour.RED)
         self.assertEqual(item.colour, Colour.RED, "Colour should be RED")
-        self.assertTrue(
-            item.__eq__(Colour.RED), "Colour should equal Colour.RED"
-        )
-        self.assertTrue(
-            item.__eq__("RED"), "Colour should equal the string RED"
-        )
+        self.assertTrue(item.__eq__(Colour.RED), "Colour should equal Colour.RED")
+        self.assertTrue(item.__eq__("RED"), "Colour should equal the string RED")
         self.assertTrue(
             item.__eq__(Colour.RED.value),
             "Colour should equal Colour.RED.value",
         )
-        self.assertTrue(
-            item.__ne__(Colour.BLUE), "Colour should not equal Colour.BLUE"
-        )
-        self.assertTrue(
-            item.__ne__("BLUE"), "Colour should not equal the string BLUE"
-        )
+        self.assertTrue(item.__ne__(Colour.BLUE), "Colour should not equal Colour.BLUE")
+        self.assertTrue(item.__ne__("BLUE"), "Colour should not equal the string BLUE")
         self.assertTrue(
             item.__ne__(Colour.BLUE.value),
             "Colour should not equal Colour.BLUE.value",
         )
         self.assertEqual(
             item.__str__(),
-            "\x1b[31m\u25A0\x1b[39m",
+            "\x1b[31m\u25a0\x1b[39m",
             "Item string representation should be a coloured square",
         )
         self.assertEqual(
@@ -53,9 +47,7 @@ class TestItem(TestCase):
         self.assertEqual(item, Colour.RED, "Colour should be RED")
         self.assertEqual(item.colour, Colour.RED, "Colour should be RED")
         self.assertEqual(item, Colour.RED.value, "Colour should be RED")
-        self.assertEqual(
-            Item("\x1b[31m"), Colour.RED, "Colour should match value"
-        )
+        self.assertEqual(Item("\x1b[31m"), Colour.RED, "Colour should match value")
 
     def test_item_equality(self):
         """Items initalised from a string and enum should compare equal."""

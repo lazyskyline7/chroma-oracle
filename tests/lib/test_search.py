@@ -1,5 +1,7 @@
 """Tests for the search module."""
+
 from unittest import TestCase
+
 from solver.lib import search
 from solver.lib.collection import ContainerCollection
 from solver.lib.move import Move
