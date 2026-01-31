@@ -45,7 +45,7 @@ def calculate_needed_colors(data: UnknownPuzzleData) -> list[str] | None:
         List of colors needed, or None if puzzle structure is invalid.
     """
     counts: dict[str, int] = {}
-    valid_colors = [c.name for c in Colour]
+    valid_colors = [c.name for c in Colour if c.name != "UNKNOWN"]
 
     for item in data.all_items:
         counts[item] = counts.get(item, 0) + 1

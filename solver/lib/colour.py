@@ -28,3 +28,4 @@ class Colour(Enum):
     GREY = fg(245)
     PURPLE = fg(93)
     ORANGE = ORANGE
+    UNKNOWN = fg.black

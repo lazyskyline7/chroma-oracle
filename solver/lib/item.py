@@ -4,14 +4,16 @@ from solver.lib.colour import Colour
 
 
 class Item:
-    """A representation of a coloured thing that is compareable."""
+    """A representation of a coloured thing that is comparable."""
 
     def __init__(self, colour: Colour | str):
         """Create a new coloured thing."""
         if isinstance(colour, Colour):
             self.colour = colour
         if isinstance(colour, str):
-            if colour in Colour.__members__:
+            if colour == "?":
+                self.colour = Colour.UNKNOWN
+            elif colour in Colour.__members__:
                 self.colour = Colour[colour]
             else:
                 self.colour = Colour(colour)

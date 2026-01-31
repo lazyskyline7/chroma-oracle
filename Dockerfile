@@ -12,13 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 WORKDIR /app
 
 # Copy dependency definitions
-COPY pyproject.toml uv.lock ./
-COPY README.md ./
+COPY pyproject.toml uv.lock README.md ./
 
 # Install dependencies using uv
-# --system: Install into the system Python environment (no venv)
-# --no-cache: Don't store cache in the layer
-RUN uv pip install --system --no-cache .
+# Install dependencies from pyproject.toml first to leverage Docker caching
+RUN uv pip install --system --no-cache -r pyproject.toml
 
 # Copy project files
 COPY solver ./solver
@@ -27,6 +25,9 @@ COPY docker-entrypoint.sh ./
 
 # Make entrypoint executable
 RUN chmod +x docker-entrypoint.sh
+
+# Install the project itself (no-deps because we already installed them)
+RUN uv pip install --system --no-cache --no-deps .
 
 # Set the entrypoint to the custom script
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
