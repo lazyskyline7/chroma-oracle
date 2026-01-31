@@ -1,6 +1,5 @@
 """Module representing a single coloured item."""
 
-
 from solver.lib.colour import Colour
 
 
@@ -12,7 +11,7 @@ class Item:
         if isinstance(colour, Colour):
             self.colour = colour
         if isinstance(colour, str):
-            if colour in dir(Colour):
+            if colour in Colour.__members__:
                 self.colour = Colour[colour]
             else:
                 self.colour = Colour(colour)
@@ -24,7 +23,7 @@ class Item:
         if isinstance(other, Colour):
             return self.colour == other
         if isinstance(other, str):
-            if other in dir(Colour):
+            if other in Colour.__members__:
                 return self.colour == Colour[other]
             return self.colour == Colour(other)
         return False
@@ -43,4 +42,4 @@ class Item:
 
     def __hash__(self):
         """Get the hash of the colour of this item."""
-        return self.colour.__hash__()
+        return hash(self.colour)

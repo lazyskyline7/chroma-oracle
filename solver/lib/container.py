@@ -21,6 +21,7 @@ class Container:
         self._capacity = capacity or 4
         # Ensure this is only ever set to the maximum size
         self.__data: tuple[Item, ...]
+        self.__iter_val = 0  # Initialize iterator value
         if isinstance(initial_content, Container):
             self._capacity = capacity or initial_content.capacity
             self.__data = initial_content.data[:capacity]
@@ -33,10 +34,10 @@ class Container:
                 initial_content = cast(Sequence[str], initial_content[:capacity])
                 self.__data = tuple(Item(value) for value in initial_content[:capacity])
             elif type_map == set():
-                self.__data = tuple()
+                self.__data = ()
             else:
                 raise TypeError(
-                    f"Unknown initaliser: {initial_content.__class__.__name__}"
+                    f"Unknown initializer: {initial_content.__class__.__name__}"
                     f": {type_map.__repr__()}"
                 )
 
@@ -120,9 +121,7 @@ class Container:
 
     def test(self, item: Item | None) -> bool:
         """Check if `item` can be put in this container."""
-        if self.is_full or (not self.is_empty and self.__data[-1] != item):
-            return False
-        return True
+        return not (self.is_full or not self.is_empty and self.__data[-1] != item)
 
     def pour(self, target: Container) -> bool:
         """Move the head item from this container to target container.

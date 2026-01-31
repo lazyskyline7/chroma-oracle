@@ -7,7 +7,6 @@ import click
 from solver.lib import file2collection
 from solver.lib.collection import ContainerCollection
 from solver.lib.search import Option, bfs, dfs
-from solver.match_steps import match_first_steps
 
 
 class FlexibleGroup(click.Group):
@@ -18,6 +17,7 @@ class FlexibleGroup(click.Group):
     than raising a usage error. It also allows extra args to be passed
     through to the invoked command.
     """
+
     def resolve_command(self, ctx, args):
         if not args:
             return None, None, []
@@ -29,29 +29,22 @@ class FlexibleGroup(click.Group):
         return None, None, args
 
     def invoke(self, ctx):
-        def _process_result(value):
-            if self.result_callback is not None:
-                value = ctx.invoke(self.result_callback, value, **ctx.params)
-            return value
+        args = list(getattr(ctx, "protected_args", []) or []) + list(ctx.args or [])
 
-        with self.make_context(
-            ctx.info_name,
-            list(ctx.args),
-            parent=ctx.parent,
-            allow_extra_args=True,
-            allow_interspersed_args=False,
-        ) as ctx_:
-            args = list(ctx_.protected_args or []) + list(ctx_.args or [])
-            if args:
-                cmd_name, cmd, remaining = self.resolve_command(ctx_, args)
-                if cmd is None:
-                    ctx_.args = remaining
-                    return _process_result(super(click.Group, self).invoke(ctx_))
-                else:
-                    ctx_.invoked_subcommand = cmd_name
-                    ctx_.args = remaining
-                    return _process_result(cmd.invoke(ctx_))
-            return _process_result(super(click.Group, self).invoke(ctx_))
+        if args:
+            cmd_name, cmd, remaining = self.resolve_command(ctx, args)
+            if cmd is not None:
+                ctx.invoked_subcommand = cmd_name
+
+                if self.callback is not None:
+                    ctx.invoke(self.callback, **ctx.params)
+
+                with cmd.make_context(cmd_name, remaining, parent=ctx) as cmd_ctx:
+                    return cmd.invoke(cmd_ctx)
+
+        ctx.args = args
+
+        return click.Command.invoke(self, ctx)
 
 
 @click.group(cls=FlexibleGroup, invoke_without_command=True)
@@ -76,12 +69,11 @@ class FlexibleGroup(click.Group):
 )
 @click.pass_context
 def cli(
-    ctx,
-    algorithm="BFS",
-    verbose=False,
-    validate=False,
-    prog_name="chroma-oracle",  # pylint: disable=W0613
-):
+    ctx: click.Context,
+    algorithm: str = "BFS",
+    verbose: bool = False,
+    validate: bool = False,
+) -> None:
     """Solve PUZZLE or run a subcommand.
 
     PUZZLE is the path to a json file describing the puzzle to solve.
@@ -124,14 +116,3 @@ def cli(
     else:
         print("solved in", len(result.moves), "moves")
         print(result.collection, "\n\n", result.moves, sep="")
-
-
-@cli.command("match-steps")
-@click.argument("folder", type=click.Path(file_okay=False, resolve_path=True))
-@click.argument("reference", type=click.Path(dir_okay=False, resolve_path=True))
-@click.argument("n", required=False, type=int, default=2)
-@click.pass_context
-def match_steps_cmd(ctx, folder, reference, n):
-    """Match first N moves of all JSON files in FOLDER against REFERENCE."""
-    algorithm = ctx.obj.get("algorithm", "BFS")
-    match_first_steps(folder, reference, n, algorithm)

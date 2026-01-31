@@ -12,7 +12,7 @@ def load(file: TextIO, *, reject_invalid: bool = False) -> ContainerCollection:
     content: list[list[str]] = json.load(file)
 
     if reject_invalid:
-        colours: dict[str, int] = dict()
+        colours: dict[str, int] = {}
         for container_list in content:
             for item in container_list:
                 if item in colours:

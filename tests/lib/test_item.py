@@ -9,20 +9,20 @@ from solver.lib.item import Item
 class TestItem(TestCase):
     """Test cases for the Item class."""
 
-    def test_item_Colour(self):
-        """Test Item initalised from the Colour enum."""
+    def test_item_colour(self):
+        """Test Item initialized from the Colour enum."""
         item = Item(Colour.RED)
         self.assertEqual(item.colour, Colour.RED, "Colour should be RED")
-        self.assertTrue(item.__eq__(Colour.RED), "Colour should equal Colour.RED")
-        self.assertTrue(item.__eq__("RED"), "Colour should equal the string RED")
+        self.assertTrue(item == Colour.RED, "Colour should equal Colour.RED")
+        self.assertTrue(item == "RED", "Colour should equal the string RED")
         self.assertTrue(
-            item.__eq__(Colour.RED.value),
+            item == Colour.RED.value,
             "Colour should equal Colour.RED.value",
         )
-        self.assertTrue(item.__ne__(Colour.BLUE), "Colour should not equal Colour.BLUE")
-        self.assertTrue(item.__ne__("BLUE"), "Colour should not equal the string BLUE")
+        self.assertTrue(item != Colour.BLUE, "Colour should not equal Colour.BLUE")
+        self.assertTrue(item != "BLUE", "Colour should not equal the string BLUE")
         self.assertTrue(
-            item.__ne__(Colour.BLUE.value),
+            item != Colour.BLUE.value,
             "Colour should not equal Colour.BLUE.value",
         )
         self.assertEqual(
@@ -36,8 +36,8 @@ class TestItem(TestCase):
             "Item debug representation should be the name of the colour",
         )
         self.assertEqual(
-            item.__hash__(),
-            Colour.RED.__hash__(),
+            hash(item),
+            hash(Colour.RED),
             "Item hash should match Colour hash",
         )
 

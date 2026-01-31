@@ -13,7 +13,7 @@ WORKDIR /app
 
 # Copy dependency definitions
 COPY pyproject.toml uv.lock ./
-COPY README.md setup.py ./
+COPY README.md ./
 
 # Install dependencies using uv
 # --system: Install into the system Python environment (no venv)

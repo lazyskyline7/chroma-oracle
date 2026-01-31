@@ -29,7 +29,7 @@ class ContainerCollection:
     @property
     def is_solved(self) -> bool:
         """Check if all containers are solved."""
-        return all([container.is_solved for container in self.data])
+        return all(container.is_solved for container in self.data)
 
     # work out all possible next moves:
     def get_moves(self) -> list[Move]:
@@ -119,7 +119,7 @@ class ContainerCollection:
         rather than using the `after` method.
         """
         if self.__unique_set is None:
-            self.__unique_set = set(container.data for container in self.data)
+            self.__unique_set = {container.data for container in self.data}
         return self.__unique_set
 
     def __eq__(self, other: object) -> bool:
@@ -133,7 +133,7 @@ class ContainerCollection:
         if isinstance(other, ContainerCollection):
             return self._unique_set() == other._unique_set()
         if isinstance(other, list):
-            return self._unique_set() == set(container.data for container in other)
+            return self._unique_set() == {container.data for container in other}
         return False
 
     def __ne__(self, other: object) -> bool:

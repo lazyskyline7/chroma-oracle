@@ -1,4 +1,4 @@
-"""Test the contianer module."""
+"""Test the container module."""
 
 from unittest import TestCase
 
@@ -22,7 +22,7 @@ class TestContainer(TestCase):
         self.assertTrue(cont.test(Item(Colour.RED)), "Any colour should test true")
         self.assertTrue(cont.test(Item(Colour.BLUE)), "Any colour should test true")
         self.assertEqual(str(cont), "[    ]", "Empty collection")
-        self.assertEqual(cont.__repr__(), "[]", "Empty collection")
+        self.assertEqual(repr(cont), "[]", "Empty collection")
 
     def test_container_capacity(self):
         """Check changing the capacity works."""
@@ -68,10 +68,10 @@ class TestContainer(TestCase):
     def test_container_from_invalid_type(self):
         """Check that construction with a bad type raises an exception."""
         with self.assertRaises(TypeError):
-            Container(None)
+            Container(None)  # type: ignore[arg-type]
 
         with self.assertRaises(TypeError):
-            Container(object)
+            Container(object)  # type: ignore[arg-type]
 
     def test_container_full_mixed(self):
         """Construct a full mixed container and check it's properties."""
@@ -97,7 +97,7 @@ class TestContainer(TestCase):
             "Viewable representation",
         )
         self.assertEqual(
-            cont.__repr__(),
+            repr(cont),
             "['RED','RED','GREEN','GREEN']",
             "Copy pasteable representation",
         )
@@ -112,7 +112,7 @@ class TestContainer(TestCase):
     def test_container_add_empty(self):
         """Test adding to an empty container."""
         cont = Container([])
-        self.assertTrue(cont.add(Colour.RED), "Add should succeed")
+        self.assertTrue(cont.add(Item(Colour.RED)), "Add should succeed")
         self.assertFalse(cont.is_empty, "The container is no longer empty")
         self.assertTupleEqual(
             cont.data, (Colour.RED,), "Red has been added to the container"
@@ -123,7 +123,7 @@ class TestContainer(TestCase):
         cont = Container(["RED"], 1)
         self.assertTrue(cont.is_full, "The container is full")
 
-        self.assertFalse(cont.add(Colour.RED), "Cannot add to a full container")
+        self.assertFalse(cont.add(Item(Colour.RED)), "Cannot add to a full container")
         self.assertTupleEqual(
             cont.data, (Colour.RED,), "The collection should be unchanged"
         )
@@ -249,7 +249,7 @@ class TestContainer(TestCase):
         """Check the number of matches after an add is correct."""
         cont = Container(["GREEN", "RED", "GREEN"])
         self.assertEqual(cont.num_matching_head, 1, "No consecutive colours")
-        cont.add(Colour.GREEN)
+        cont.add(Item(Colour.GREEN))
         self.assertEqual(cont.num_matching_head, 2, "Two consecutive colours after add")
 
     def test_container_num_at_head_after_pour_single_in_src(self):

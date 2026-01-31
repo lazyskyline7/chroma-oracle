@@ -17,10 +17,13 @@ class TestContainerCollection(TestCase):
     def test_construct_with_invalid(self):
         """Constructing with an invalid type should cause a TypeError."""
         with self.assertRaises(TypeError):
-            ContainerCollection(None)
+            ContainerCollection(object())  # type: ignore[arg-type]
 
         with self.assertRaises(TypeError):
-            ContainerCollection(object)
+            ContainerCollection("invalid string")  # type: ignore[arg-type]
+
+        with self.assertRaises(TypeError):
+            ContainerCollection(123)  # type: ignore[arg-type]
 
     def test_construct_with_list(self):
         """Construct with a list of collections."""
@@ -33,7 +36,7 @@ class TestContainerCollection(TestCase):
 
     def test_is_solved_single_empty(self):
         """An empty collection is always solved."""
-        coll = ContainerCollection([[]])
+        coll = ContainerCollection([[]])  # type: ignore[arg-type]
         self.assertTrue(
             coll.is_solved,
             "A single empty container results in a solved collection",

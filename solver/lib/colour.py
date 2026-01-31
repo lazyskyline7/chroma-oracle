@@ -2,29 +2,29 @@
 
 from enum import Enum
 
-from sty import RgbFg, Style, fg
+from sty import fg
 
-fg.li_green = Style(RgbFg(153, 255, 153))
-fg.li_blue = Style(RgbFg(102, 255, 255))
-fg.green = Style(RgbFg(102, 153, 0))
-fg.brown = Style(RgbFg(110, 79, 43))
-fg.orange = Style(RgbFg(255, 150, 50))
-fg.pink = Style(RgbFg(255, 153, 204))
+LI_GREEN = fg(153, 255, 153)
+LI_BLUE = fg(102, 255, 255)
+GREEN = fg(102, 153, 0)
+BROWN = fg(110, 79, 43)
+ORANGE = fg(255, 150, 50)
+PINK = fg(255, 153, 204)
 
 
 class Colour(Enum):
     """Colours that can be used."""
 
     RED = fg.red
-    PINK = fg.pink
-    BROWN = fg.brown
-    GREEN = fg.green
-    LIGHT_GREEN = fg.li_green
+    PINK = PINK
+    BROWN = BROWN
+    GREEN = GREEN
+    LIGHT_GREEN = LI_GREEN
     DARK_GREEN = fg.da_green
     YELLOW = fg.yellow
     BLUE = fg.blue
-    LIGHT_BLUE = fg.li_blue
+    LIGHT_BLUE = LI_BLUE
     DARK_BLUE = fg.da_blue
     GREY = fg(245)
     PURPLE = fg(93)
-    ORANGE = fg.orange
+    ORANGE = ORANGE

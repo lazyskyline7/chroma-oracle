@@ -19,7 +19,7 @@ class TestJson2Collection(TestCase):
                 [],
             ]
         )
-        with pathlib.Path("./levels/debug.json").open() as reader:
+        with pathlib.Path("./levels/debug.json").open(encoding="utf-8") as reader:
             collection = json2collection.load(reader)
         self.assertEqual(collection, expected)
 
@@ -32,12 +32,12 @@ class TestJson2Collection(TestCase):
                 [],
             ]
         )
-        with pathlib.Path("./levels/bad.json").open() as reader:
+        with pathlib.Path("./levels/bad.json").open(encoding="utf-8") as reader:
             collection = json2collection.load(reader, reject_invalid=False)
         self.assertEqual(collection, expected)
 
     def test_load_invalid_(self):
         """Test loading from a invalid json file and rejecting it."""
-        with self.assertRaises(ValueError):
-            with pathlib.Path("./levels/bad.json").open() as reader:
+        with self.assertRaises(ValueError):  # noqa: SIM117
+            with pathlib.Path("./levels/bad.json").open(encoding="utf-8") as reader:
                 _ = json2collection.load(reader, reject_invalid=True)

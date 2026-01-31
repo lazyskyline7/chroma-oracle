@@ -19,12 +19,17 @@ def bfs(root: ContainerCollection) -> Option | None:
     """Perform a Breadth-first search to find an optimal solution."""
     # Ensure the search is required
     if root.is_solved:
-        return Option(root, tuple())
-    queue: list[Option] = [
-        Option(root.after(move), (move,)) for move in root.get_moves()
-    ]
+        return Option(root, ())
+
+    queue: list[Option] = []
+    for move in root.get_moves():
+        next_coll = root.after(move)
+        if next_coll.is_solved:
+            return Option(next_coll, (move,))
+        queue.append(Option(next_coll, (move,)))
+
     while len(queue) > 0:
-        logging.debug(f"loop {len(queue[0].moves)} Options {len(queue)}")
+        logging.debug("loop %d Options %d", len(queue[0].moves), len(queue))
         next_queue: list[Option] = []
         discovered: list[ContainerCollection] = []
         for option in queue:
@@ -63,11 +68,11 @@ def dfs(root: ContainerCollection) -> Option | None:
     """Perform a depth-first search to find a solution."""
     # Ensure the search is required
     if root.is_solved:
-        return Option(root, tuple())
+        return Option(root, ())
 
     visited: list[ContainerCollection] = []
     # Call the recursive function
-    return _dfs(visited, Option(root, tuple()))
+    return _dfs(visited, Option(root, ()))
 
 
 def _dfs(visited: list[ContainerCollection], option: Option) -> Option | None:

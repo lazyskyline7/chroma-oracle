@@ -1,73 +1,23 @@
 """Find guaranteed winning moves for puzzles with unknown colors.
 
 This module finds the longest sequence of moves that work for ALL possible
-color assignments of unknowns ("?" or "UNKNOWN" slots), accounting for
-the fact that visible top colors might be stacked (e.g., multiple REDs on top).
+color assignments of unknowns ("?" or "UNKNOWN" slots), allowing players
+to make progress without guessing.
 
 Usage: `python -m solver.win_strategy <json_file> [BFS|DFS]`
 """
 
-import copy
-import itertools
-import json
 import sys
 
 from solver.lib.collection import ContainerCollection
-from solver.lib.colour import Colour
 from solver.lib.move import Move
 from solver.lib.search import bfs, dfs
-
-
-def generate_permutations_with_stacking(raw_grid, unknown_indices, needed):
-    """Generate permutations accounting for potential stacking of visible colors.
-
-    For containers like ["?", "?", "?", "RED"], the visible RED might be
-    part of a stack (e.g., ["?", "?", "RED", "RED"]). This function generates
-    permutations that include such stacking possibilities.
-
-    Args:
-        raw_grid: The puzzle grid with "?" markers
-        unknown_indices: List of (row, col) tuples for unknown positions
-        needed: List of colors needed to complete sets of 4
-
-    Returns:
-        List of valid permutations to test
-    """
-    base_perms = list(set(itertools.permutations(needed)))
-
-    all_perms_with_variants = []
-
-    for perm in base_perms:
-        candidate_grid = copy.deepcopy(raw_grid)
-        for idx, (r, c) in enumerate(unknown_indices):
-            candidate_grid[r][c] = perm[idx]
-
-        variants = generate_stacking_variants(candidate_grid)
-        all_perms_with_variants.extend(variants)
-
-    unique_grids = []
-    seen = set()
-    for grid in all_perms_with_variants:
-        grid_tuple = tuple(tuple(row) for row in grid)
-        if grid_tuple not in seen:
-            seen.add(grid_tuple)
-            unique_grids.append(grid)
-
-    return unique_grids
-
-
-def generate_stacking_variants(grid):
-    """Generate variants where visible top colors might be stacked deeper.
-
-    For each container, if we see color X at the top, it might actually be:
-    - Just 1 X on top: [..., Y, X]
-    - 2 Xs stacked: [..., X, X]
-    - 3 Xs stacked: [..., X, X, X]
-    - etc.
-
-    Returns all valid variants of the grid accounting for this.
-    """
-    return [grid]
+from solver.lib.unknown_solver import (
+    calculate_needed_colors,
+    generate_candidate_grids,
+    load_puzzle_with_unknowns,
+    solve_all_candidates,
+)
 
 
 def find_all_solutions(
@@ -84,23 +34,12 @@ def find_all_solutions(
         Returns empty list if no solutions exist.
     """
     print(f"Reading puzzle from {puzzle_path}...")
-    with open(puzzle_path, encoding="utf-8") as f:
-        raw_grid = json.load(f)
+    data = load_puzzle_with_unknowns(puzzle_path)
 
-    all_items = []
-    unknown_indices = []
-
-    for r, row in enumerate(raw_grid):
-        for c, item in enumerate(row):
-            if item == "UNKNOWN" or item == "?":
-                unknown_indices.append((r, c))
-            else:
-                all_items.append(item)
-
-    if not unknown_indices:
+    if not data.unknown_indices:
         print("No UNKNOWN items found. Solving standard puzzle...")
         try:
-            collection = ContainerCollection(raw_grid)
+            collection = ContainerCollection(data.raw_grid)
             result = bfs(collection) if algorithm == "BFS" else dfs(collection)
             if result:
                 return [result.moves]
@@ -108,85 +47,26 @@ def find_all_solutions(
             print(f"Error: {e}")
         return []
 
-    counts = {}
-    valid_colors = [c.name for c in Colour]
-
-    for item in all_items:
-        counts[item] = counts.get(item, 0) + 1
-
-    needed = []
-    print(f"Current color counts: {counts}")
-    for color, c_count in counts.items():
-        if c_count < 4:
-            needed.extend([color] * (4 - c_count))
-        elif c_count > 4:
-            print(f"Error: Color {color} appears {c_count} times (more than 4).")
-            return []
-
-    missing_slots = len(unknown_indices) - len(needed)
-
-    if missing_slots > 0:
-        if missing_slots % 4 == 0:
-            num_new_colors = missing_slots // 4
-            unused_colors = [c for c in valid_colors if c not in counts]
-            if len(unused_colors) >= num_new_colors:
-                for i in range(num_new_colors):
-                    needed.extend([unused_colors[i]] * 4)
-                print(
-                    f"Assumed {num_new_colors} fully hidden colors: "
-                    f"{needed[-missing_slots:]}"
-                )
-            else:
-                print(
-                    f"Error: Need {num_new_colors} new colors but only "
-                    f"have {len(unused_colors)} unused valid colors."
-                )
-                return []
-        else:
-            print(
-                f"Error: {missing_slots} unknown slots remaining, which "
-                "is not a multiple of 4. Cannot form complete sets."
-            )
-            return []
-    elif missing_slots < 0:
-        print(
-            f"Error: Have {len(unknown_indices)} slots but existing "
-            f"colors need {len(needed)} items to complete."
-        )
+    needed = calculate_needed_colors(data)
+    if needed is None:
         return []
 
-    print(f"Solving for {len(unknown_indices)} unknowns.")
+    print(f"Solving for {len(data.unknown_indices)} unknowns.")
     print(f"Candidates to place: {needed}")
 
-    print(f"⚠️  NOTE: Accounting for potential stacking of visible colors...")
-    print(f"   (e.g., ['?','?','?','RED'] might be ['?','?','RED','RED'])")
-
-    candidate_grids = generate_permutations_with_stacking(
-        raw_grid, unknown_indices, needed
-    )
+    candidate_grids = generate_candidate_grids(data, needed)
     print(f"Testing {len(candidate_grids)} combinations using {algorithm}...")
 
-    solutions = []
+    solutions = solve_all_candidates(candidate_grids, algorithm)
 
-    for i, candidate_grid in enumerate(candidate_grids):
-        try:
-            collection = ContainerCollection(candidate_grid)
+    solution_moves = []
+    for _, (_grid, moves) in enumerate(solutions, 1):
+        solution_moves.append(moves)
+        if len(solution_moves) <= 10 or len(solution_moves) % 10 == 0:
+            print(f"  Solution {len(solution_moves)}: {len(moves)} moves")
 
-            if algorithm == "BFS":
-                result = bfs(collection)
-            else:
-                result = dfs(collection)
-
-            if result:
-                solutions.append(result.moves)
-                if len(solutions) <= 10 or len(solutions) % 10 == 0:
-                    print(f"  Solution {len(solutions)}: {len(result.moves)} moves")
-
-        except (ValueError, TypeError, AttributeError, KeyError, IndexError):
-            pass
-
-    print(f"Found {len(solutions)} valid solutions.")
-    return solutions
+    print(f"Found {len(solution_moves)} valid solutions.")
+    return solution_moves
 
 
 def find_common_prefix(solutions: list[tuple[Move, ...]]) -> tuple[Move, ...]:
@@ -200,7 +80,7 @@ def find_common_prefix(solutions: list[tuple[Move, ...]]) -> tuple[Move, ...]:
         Returns empty tuple if no common moves or no solutions.
     """
     if not solutions:
-        return tuple()
+        return ()
 
     min_length = min(len(sol) for sol in solutions)
 
@@ -270,7 +150,7 @@ def find_winning_moves(puzzle_path: str, algorithm: str = "BFS") -> None:
         print("  2. Use additional game information to narrow possibilities")
         print()
         print("First moves across different solutions:")
-        unique_first_moves = set((sol[0].src, sol[0].dest) for sol in solutions if sol)
+        unique_first_moves = {(sol[0].src, sol[0].dest) for sol in solutions if sol}
         for src, dest in sorted(unique_first_moves):
             count = sum(
                 1
