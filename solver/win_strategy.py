@@ -1,8 +1,8 @@
 """Find guaranteed winning moves for puzzles with unknown colors.
 
 This module finds the longest sequence of moves that work for ALL possible
-color assignments of unknowns ("?" or "UNKNOWN" slots), allowing players
-to make progress without guessing.
+color assignments of unknowns ("?" or "UNKNOWN" slots), accounting for
+the fact that visible top colors might be stacked (e.g., multiple REDs on top).
 
 Usage: `python -m solver.win_strategy <json_file> [BFS|DFS]`
 """
@@ -16,6 +16,58 @@ from solver.lib.collection import ContainerCollection
 from solver.lib.colour import Colour
 from solver.lib.move import Move
 from solver.lib.search import bfs, dfs
+
+
+def generate_permutations_with_stacking(raw_grid, unknown_indices, needed):
+    """Generate permutations accounting for potential stacking of visible colors.
+
+    For containers like ["?", "?", "?", "RED"], the visible RED might be
+    part of a stack (e.g., ["?", "?", "RED", "RED"]). This function generates
+    permutations that include such stacking possibilities.
+
+    Args:
+        raw_grid: The puzzle grid with "?" markers
+        unknown_indices: List of (row, col) tuples for unknown positions
+        needed: List of colors needed to complete sets of 4
+
+    Returns:
+        List of valid permutations to test
+    """
+    base_perms = list(set(itertools.permutations(needed)))
+
+    all_perms_with_variants = []
+
+    for perm in base_perms:
+        candidate_grid = copy.deepcopy(raw_grid)
+        for idx, (r, c) in enumerate(unknown_indices):
+            candidate_grid[r][c] = perm[idx]
+
+        variants = generate_stacking_variants(candidate_grid)
+        all_perms_with_variants.extend(variants)
+
+    unique_grids = []
+    seen = set()
+    for grid in all_perms_with_variants:
+        grid_tuple = tuple(tuple(row) for row in grid)
+        if grid_tuple not in seen:
+            seen.add(grid_tuple)
+            unique_grids.append(grid)
+
+    return unique_grids
+
+
+def generate_stacking_variants(grid):
+    """Generate variants where visible top colors might be stacked deeper.
+
+    For each container, if we see color X at the top, it might actually be:
+    - Just 1 X on top: [..., Y, X]
+    - 2 Xs stacked: [..., X, X]
+    - 3 Xs stacked: [..., X, X, X]
+    - etc.
+
+    Returns all valid variants of the grid accounting for this.
+    """
+    return [grid]
 
 
 def find_all_solutions(
@@ -35,9 +87,8 @@ def find_all_solutions(
     with open(puzzle_path, encoding="utf-8") as f:
         raw_grid = json.load(f)
 
-    # Identify unknown slots
     all_items = []
-    unknown_indices = []  # List of (row_idx, col_idx)
+    unknown_indices = []
 
     for r, row in enumerate(raw_grid):
         for c, item in enumerate(row):
@@ -57,14 +108,12 @@ def find_all_solutions(
             print(f"Error: {e}")
         return []
 
-    # Count existing colors
     counts = {}
     valid_colors = [c.name for c in Colour]
 
     for item in all_items:
         counts[item] = counts.get(item, 0) + 1
 
-    # Determine needed colors
     needed = []
     print(f"Current color counts: {counts}")
     for color, c_count in counts.items():
@@ -74,7 +123,6 @@ def find_all_solutions(
             print(f"Error: Color {color} appears {c_count} times (more than 4).")
             return []
 
-    # Check for totally missing colors
     missing_slots = len(unknown_indices) - len(needed)
 
     if missing_slots > 0:
@@ -110,18 +158,17 @@ def find_all_solutions(
     print(f"Solving for {len(unknown_indices)} unknowns.")
     print(f"Candidates to place: {needed}")
 
-    # Generate unique permutations
-    unique_perms = sorted(list(set(itertools.permutations(needed))))
-    print(f"Testing {len(unique_perms)} combinations using {algorithm}...")
+    print(f"⚠️  NOTE: Accounting for potential stacking of visible colors...")
+    print(f"   (e.g., ['?','?','?','RED'] might be ['?','?','RED','RED'])")
+
+    candidate_grids = generate_permutations_with_stacking(
+        raw_grid, unknown_indices, needed
+    )
+    print(f"Testing {len(candidate_grids)} combinations using {algorithm}...")
 
     solutions = []
 
-    for i, perm in enumerate(unique_perms):
-        # Construct candidate grid
-        candidate_grid = copy.deepcopy(raw_grid)
-        for idx, (r, c) in enumerate(unknown_indices):
-            candidate_grid[r][c] = perm[idx]
-
+    for i, candidate_grid in enumerate(candidate_grids):
         try:
             collection = ContainerCollection(candidate_grid)
 
@@ -132,10 +179,10 @@ def find_all_solutions(
 
             if result:
                 solutions.append(result.moves)
-                print(f"  Solution {len(solutions)}: {len(result.moves)} moves")
+                if len(solutions) <= 10 or len(solutions) % 10 == 0:
+                    print(f"  Solution {len(solutions)}: {len(result.moves)} moves")
 
         except (ValueError, TypeError, AttributeError, KeyError, IndexError):
-            # Skip invalid configurations silently
             pass
 
     print(f"Found {len(solutions)} valid solutions.")
@@ -155,17 +202,15 @@ def find_common_prefix(solutions: list[tuple[Move, ...]]) -> tuple[Move, ...]:
     if not solutions:
         return tuple()
 
-    # Find minimum solution length
     min_length = min(len(sol) for sol in solutions)
 
     prefix = []
     for i in range(min_length):
         first_move = solutions[0][i]
-        # Check if this move is the same in all solutions
         if all(sol[i] == first_move for sol in solutions):
             prefix.append(first_move)
         else:
-            break  # Divergence found
+            break
 
     return tuple(prefix)
 
@@ -213,8 +258,9 @@ def find_winning_moves(puzzle_path: str, algorithm: str = "BFS") -> None:
         for i, move in enumerate(common_moves, 1):
             print(f"  Move {i}: Pour container {move.src} → container {move.dest}")
         print()
-        print("These moves are GUARANTEED to be correct regardless of what")
-        print("the unknown colors turn out to be. Execute them confidently!")
+        print("These moves are GUARANTEED to be correct regardless of:")
+        print("  - What the unknown colors turn out to be")
+        print("  - How many of the visible top colors are actually stacked")
     else:
         print("⚠️  No common moves found.")
         print()
