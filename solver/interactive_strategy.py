@@ -166,12 +166,10 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
                     print(f"  {d}")
                 print()
 
-            print("🚀 FULL SOLUTION (Guaranteed Safe):")
+            print(f"Guaranteed safe moves: {len(solutions[0][1])}\n")
             full_moves = solutions[0][1]
             for i, move in enumerate(full_moves, 1):
-                print(
-                    f"  Move {total_moves_made + i}: Container {move.src} -> {move.dest}"
-                )
+                print(f"  {i}. Container {move.src} -> {move.dest}")
             print()
             print("You can execute all these moves to finish the game.")
 
