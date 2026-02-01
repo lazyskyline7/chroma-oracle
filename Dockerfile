@@ -21,16 +21,12 @@ RUN uv pip install --system --no-cache -r pyproject.toml
 # Copy project files
 COPY chroma_oracle ./chroma_oracle
 COPY levels ./levels
-COPY docker-entrypoint.sh ./
-
-# Make entrypoint executable
-RUN chmod +x docker-entrypoint.sh
 
 # Install the project itself (no-deps because we already installed them)
 RUN uv pip install --system --no-cache --no-deps .
 
-# Set the entrypoint to the custom script
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# Set the entrypoint to the application
+ENTRYPOINT ["chroma-oracle"]
 
 # Default argument
 CMD ["--help"]
