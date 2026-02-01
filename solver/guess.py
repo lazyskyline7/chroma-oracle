@@ -58,11 +58,17 @@ def solve_mystery(puzzle_path: str, algorithm: str = "BFS") -> None:
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    for idx, (candidate_grid) in enumerate(solutions, 1):
+    for idx, (candidate_grid, moves) in enumerate(solutions, 1):
         print(f"Found solution for configuration #{idx}")
         out_filename = f"{output_dir}/{idx}.json"
+
+        # Convert moves to a serializable format (list of dicts or strings)
+        serialized_moves = [{"src": m.src, "dest": m.dest} for m in moves]
+
+        output_data = {"grid": candidate_grid, "moves": serialized_moves}
+
         with open(out_filename, "w", encoding="utf-8") as out_f:
-            json.dump(candidate_grid, out_f, indent=4)
+            json.dump(output_data, out_f, indent=4)
         print(f"  Saved to {out_filename}")
 
     print(f"Finished. Found {len(solutions)} valid configurations.")

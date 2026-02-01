@@ -16,6 +16,6 @@ class Move:
         """Get the reverse of this move."""
         return Move(self.dest, self.src)
 
-    def __str__(self) -> str:
-        """Get a string representation of this move."""
+    def __str__(self) -> str:  # keep __repr__ as dataclass default
+        """String representation matching tuple style for CLI/tests."""
         return f"({self.src}, {self.dest})"

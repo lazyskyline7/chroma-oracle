@@ -13,7 +13,7 @@ class TestCli(TestCase):
     def test_cli_no_arguments(self):
         """Invoke with no arguments and assert an error is raised."""
         runner = CliRunner()
-        result = runner.invoke(cli, [])
+        result = runner.invoke(cli, ["solve"])
 
         self.assertEqual(result.exit_code, 2)
         self.assertTrue(
@@ -38,13 +38,13 @@ class TestCli(TestCase):
 
     def test_cli_verbose(self):
         runner = CliRunner()
-        result = runner.invoke(cli, ["--verbose", "./levels/debug.json"])
+        result = runner.invoke(cli, ["solve", "--verbose", "./levels/debug.json"])
         self.assertEqual(result.exit_code, 0)
 
     def test_cli_bad_puzzle(self):
         """Invoke with a bad puzzle that cannot be solved."""
         runner = CliRunner()
-        result = runner.invoke(cli, ["./levels/bad.json"])
+        result = runner.invoke(cli, ["solve", "./levels/bad.json"])
 
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(
@@ -55,7 +55,7 @@ class TestCli(TestCase):
     def test_cli_bad_puzzle_fail_validate(self):
         """Invoke with a bad puzzle that cannot be solved."""
         runner = CliRunner()
-        result = runner.invoke(cli, ["--validate", "./levels/bad.json"])
+        result = runner.invoke(cli, ["solve", "--validate", "./levels/bad.json"])
 
         self.assertEqual(result.exit_code, 2)
         self.assertTrue(
@@ -71,7 +71,7 @@ class TestCli(TestCase):
         """
         runner = CliRunner()
         result = runner.invoke(
-            cli, ["--algorithm=bfs", "./levels/simple_shows_differences.json"]
+            cli, ["solve", "--algorithm=bfs", "./levels/simple_shows_differences.json"]
         )
 
         self.assertEqual(result.exit_code, 0)
@@ -84,11 +84,9 @@ class TestCli(TestCase):
             "BFS takes 10 moves to solve this puzzle",
         )
         self.assertTrue(
-            "(Move(src=0, dest=3), Move(src=0, dest=4), Move(src=1, dest=3), "
-            "Move(src=1, dest=4), Move(src=0, dest=1), Move(src=0, dest=3), "
-            "Move(src=2, dest=4), Move(src=2, dest=1), Move(src=2, dest=3), "
-            "Move(src=2, dest=4))" in result.output,
-            "BFS output moves for this puzzle",
+            "1. Container 0 -> 3" in result.output
+            and "10. Container 2 -> 4" in result.output,
+            "BFS numbered moves output for this puzzle",
         )
 
     def test_cli_dfs_algorithm(self):
@@ -99,7 +97,7 @@ class TestCli(TestCase):
         """
         runner = CliRunner()
         result = runner.invoke(
-            cli, ["--algorithm=dfs", "./levels/simple_shows_differences.json"]
+            cli, ["solve", "--algorithm=dfs", "./levels/simple_shows_differences.json"]
         )
 
         self.assertEqual(result.exit_code, 0)
@@ -111,13 +109,11 @@ class TestCli(TestCase):
             "solved in 13 moves" in result.output,
             "DFS takes 13 moves to solve this puzzle",
         )
+        # Legacy raw tuple output removed; verify numbered moves printed instead
         self.assertTrue(
-            "(Move(src=0, dest=3), Move(src=0, dest=4), Move(src=1, dest=3), "
-            "Move(src=1, dest=4), Move(src=0, dest=1), Move(src=0, dest=3), "
-            "Move(src=2, dest=0), Move(src=0, dest=4), Move(src=2, dest=0), "
-            "Move(src=0, dest=1), Move(src=2, dest=0), Move(src=0, dest=3), "
-            "Move(src=2, dest=4))" in result.output,
-            "DFS output moves for this puzzle",
+            "1. Container 0 -> 3" in result.output
+            and "13. Container 2 -> 4" in result.output,
+            "DFS numbered moves output for this puzzle",
         )
 
     def test_entrypoint(self):

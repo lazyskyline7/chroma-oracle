@@ -145,8 +145,5 @@ cython_debug/
 *.swo
 *~
 
-# OpenCode
-.sisyphus
-
 # Ruff cache
 .ruff_cache/

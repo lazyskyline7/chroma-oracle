@@ -132,3 +132,23 @@ def solve_all_candidates(
             pass
 
     return solutions
+
+
+def identify_hidden_items(
+    raw_grid: list[list[str]], resolved_grid: list[list[str]]
+) -> list[str]:
+    """Compare raw grid with resolved grid to identify hidden items.
+
+    Args:
+        raw_grid: Original grid with "UNKNOWN" or "?" items.
+        resolved_grid: Grid with actual colors filled in.
+
+    Returns:
+        List of description strings (e.g., "Container 0, Item 1: RED").
+    """
+    identifications = []
+    for r, (row_raw, row_res) in enumerate(zip(raw_grid, resolved_grid)):
+        for c, (item_raw, item_res) in enumerate(zip(row_raw, row_res)):
+            if item_raw in ("?", "UNKNOWN"):
+                identifications.append(f"Container {r}, position {c}: {item_res}")
+    return identifications

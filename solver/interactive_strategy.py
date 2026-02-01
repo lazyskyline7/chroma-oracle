@@ -16,7 +16,7 @@ import sys
 
 from solver.lib.collection import ContainerCollection
 from solver.lib.move import Move
-from solver.win_strategy import find_all_solutions, find_common_prefix
+from solver.lib.strategy import find_all_solutions, find_common_prefix
 
 
 def simulate_move(grid, move):
@@ -31,10 +31,7 @@ def simulate_move(grid, move):
     """
     try:
         collection = ContainerCollection(grid)
-        if isinstance(move, tuple):
-            move_obj = Move(move[0], move[1])
-        else:
-            move_obj = move
+        move_obj = Move(move[0], move[1]) if isinstance(move, tuple) else move
 
         if not collection.is_valid(move_obj):
             return None
@@ -106,12 +103,13 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
                     from solver.lib.search import bfs, dfs
 
                     result = bfs(collection) if algorithm == "BFS" else dfs(collection)
+
                     if result:
                         print(f"✅ Solution found: {len(result.moves)} moves needed")
                         print()
                         print("Remaining moves:")
                         for i, move in enumerate(result.moves, 1):
-                            print(f"  {i}. Container {move.src} → {move.dest}")
+                            print(f"  {i}. Container {move.src} -> {move.dest}")
                     else:
                         print("❌ No solution found (puzzle may be unsolvable)")
             except Exception as e:
@@ -121,8 +119,22 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
         print("Finding guaranteed safe moves...")
         print()
 
+        # Print current puzzle state and search message to match CLI output
+        try:
+            collection = ContainerCollection(current_grid)
+            print("Initial state:")
+            print(collection, "\n")
+        except Exception:
+            # If printing fails, continue without blocking the interactive flow
+            pass
+
+        if algorithm == "BFS":
+            print("Searching using Breadth-First Search\n")
+        elif algorithm == "DFS":
+            print("Searching using Depth-First Search\n")
+
         temp_file = f"/tmp/chroma_oracle_temp_iter{iteration}.json"
-        with open(temp_file, "w") as f:
+        with open(temp_file, "w", encoding="utf-8") as f:
             json.dump(current_grid, f)
 
         solutions = find_all_solutions(temp_file, algorithm)
@@ -130,6 +142,48 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
         if not solutions:
             print("❌ No solutions found from this state.")
             print("The puzzle may be unsolvable, or you may have made an error.")
+            break
+
+        # Check for unique solution (Eureka moment)
+        if len(solutions) == 1:
+            from solver.lib.unknown_solver import identify_hidden_items
+
+            print()
+            print("=" * 70)
+            print("✨ MYSTERY SOLVED! ✨")
+            print("=" * 70)
+            print()
+            print("There is only ONE valid solution to this puzzle.")
+            print("This means we know exactly what the hidden items are.")
+            print()
+
+            resolved_grid = solutions[0][0]
+            deductions = identify_hidden_items(current_grid, resolved_grid)
+
+            if deductions:
+                print("🔍 DEDUCED HIDDEN ITEMS:")
+                for d in deductions:
+                    print(f"  {d}")
+                print()
+
+            print("🚀 FULL SOLUTION (Guaranteed Safe):")
+            full_moves = solutions[0][1]
+            for i, move in enumerate(full_moves, 1):
+                print(
+                    f"  Move {total_moves_made + i}: Container {move.src} -> {move.dest}"
+                )
+            print()
+            print("You can execute all these moves to finish the game.")
+
+            # Show the FINAL solved state from the solution itself
+            # No need to simulate on raw grid since we know the full truth
+            final_coll = ContainerCollection(resolved_grid)
+            # Apply all moves to get final state
+            for move in solutions[0][1]:
+                final_coll = final_coll.after(move)
+
+            print("State after solving:")
+            print(final_coll, "\n")
             break
 
         common_moves = find_common_prefix(solutions)
@@ -153,14 +207,16 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
             print("Possible first moves:")
             unique_first: dict[tuple[int, int], int] = {}
             for sol in solutions:
-                if sol:
-                    key = (sol[0].src, sol[0].dest)
+                moves = sol[1]
+                if moves:
+                    first_move = moves[0]
+                    key = (first_move.src, first_move.dest)
                     unique_first[key] = unique_first.get(key, 0) + 1
 
             for (src, dest), count in sorted(unique_first.items(), key=lambda x: -x[1]):
                 percentage = (count / len(solutions)) * 100
                 print(
-                    f"  Container {src} → {dest} ({count}/{len(solutions)} = {percentage:.1f}% of solutions)"
+                    f"  Container {src} -> {dest} ({count}/{len(solutions)} = {percentage:.1f}% of solutions)"
                 )
 
             print()
@@ -170,7 +226,7 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
         print(f"✅ EXECUTE THESE {len(common_moves)} MOVE(S) NOW:")
         print()
         for i, move in enumerate(common_moves, 1):
-            print(f"  Move {total_moves_made + i}: Container {move.src} → {move.dest}")
+            print(f"  Move {total_moves_made + i}: Container {move.src} -> {move.dest}")
         print()
         print("These moves are SAFE - they work for all possible unknown values.")
         print()
@@ -184,22 +240,41 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
         for i, move in enumerate(common_moves):
             simulated_grid = simulate_move(simulated_grid, move)
             if simulated_grid is None:
-                print(f"⚠️  Warning: Could not simulate move {i + 1}")
+                print(
+                    f"Note: Simulation stopped at move {i + 1} (involves unknown items)"
+                )
                 simulated_grid = current_grid
                 break
 
         if simulated_grid:
             print("After executing the moves, containers will look like:")
             print()
-            for idx, container in enumerate(simulated_grid):
-                if container:
-                    display = " ".join(
-                        str(c) if c not in ["?", "UNKNOWN"] else "?" for c in container
-                    )
-                    print(f"  Container {idx}: [{display}]")
-                else:
-                    print(f"  Container {idx}: [empty]")
-            print()
+            # Use ContainerCollection string representation for consistency
+            try:
+                coll = ContainerCollection(simulated_grid)
+                # Annotate containers that changed compared to the current collection
+                orig_coll = ContainerCollection(current_grid)
+                orig_lines = str(orig_coll).splitlines()
+                sim_lines = str(coll).splitlines()
+                annotated = []
+                for i, line in enumerate(sim_lines):
+                    if i < len(orig_lines) and line != orig_lines[i]:
+                        annotated.append(line + " (changed)")
+                    else:
+                        annotated.append(line)
+                print("\n".join(annotated), "\n")
+            except Exception:
+                # Fallback to previous display if construction fails
+                for idx, container in enumerate(simulated_grid):
+                    if container:
+                        display = " ".join(
+                            str(c) if c not in ["?", "UNKNOWN"] else "?"
+                            for c in container
+                        )
+                        print(f"  Container {idx}: [{display}]")
+                    else:
+                        print(f"  Container {idx}: [empty]")
+                print()
 
         print("-" * 70)
         print("NEXT STEPS")

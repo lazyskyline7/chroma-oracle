@@ -36,6 +36,9 @@ class Item:
 
     def __str__(self):
         """Get a square of `colour` for printing."""
+        # Show unknowns as a simple '?' for consistency
+        if self.colour.name == "UNKNOWN":
+            return "?"
         return self.colour.value + "\u25a0\x1b[39m"
 
     def __repr__(self):
