@@ -1,12 +1,12 @@
 [project]
 name = "chroma-oracle"
-version = "1.0.0"
+version = "2.0.0"
 description = "A colour sorting puzzle solver with mystery guessing capabilities"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "click>=7.1.2",
-    "sty>=1.0.0b12",
+    "click>=8.0.0",
+    "sty>=1.0.0",
 ]
 
 [project.scripts]
@@ -21,8 +21,8 @@ exclude = ["tests*", "tests"]
 
 [dependency-groups]
 dev = [
-    "pytest>=6.0",
-    "ruff>=0.8.0",
+    "pytest>=8.0.0",
+    "ruff>=0.14.0",
     "mypy>=1.0.0",
     "types-setuptools",
 ]
@@ -31,7 +31,6 @@ dev = [
 target-version = "py313"
 line-length = 88
 exclude = [
-    ".eggs",
     ".git",
     ".venv",
     ".mypy_cache",

@@ -4,7 +4,7 @@ requires-python = ">=3.13"
 
 [[package]]
 name = "chroma-oracle"
-version = "1.0.0"
+version = "2.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -21,15 +21,15 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "click", specifier = ">=7.1.2" },
-    { name = "sty", specifier = ">=1.0.0b12" },
+    { name = "click", specifier = ">=8.0.0" },
+    { name = "sty", specifier = ">=1.0.0" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.0.0" },
-    { name = "pytest", specifier = ">=6.0" },
-    { name = "ruff", specifier = ">=0.8.0" },
+    { name = "pytest", specifier = ">=8.0.0" },
+    { name = "ruff", specifier = ">=0.14.0" },
     { name = "types-setuptools" },
 ]
 

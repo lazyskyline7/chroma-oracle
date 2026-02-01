@@ -7,6 +7,7 @@ representative concrete candidate grids.
 """
 
 import logging
+from importlib import metadata
 
 import click
 
@@ -21,6 +22,7 @@ from chroma_oracle.lib.unknown_solver import load_puzzle_with_unknowns
 
 @click.group(invoke_without_command=True)
 @click.pass_context
+@click.version_option(version=metadata.version("chroma-oracle"))
 def cli(ctx: click.Context) -> None:
     ctx.ensure_object(dict)
 
