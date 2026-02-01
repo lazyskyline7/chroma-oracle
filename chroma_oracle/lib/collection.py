@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from solver.lib.container import Container
-from solver.lib.move import Move
+from chroma_oracle.lib.container import Container
+from chroma_oracle.lib.move import Move
 
 
 class ContainerCollection:
@@ -139,6 +139,10 @@ class ContainerCollection:
     def __ne__(self, other: object) -> bool:
         """Check if this collection is different to `other`."""
         return not self.__eq__(other)
+
+    def __hash__(self) -> int:
+        """Get the hash of this collection."""
+        return hash(frozenset(self._unique_set()))
 
     def __str__(self) -> str:
         """Printable representation of this collection."""

@@ -2,7 +2,7 @@
 
 from collections.abc import Iterable
 
-from solver.lib.move import Move
+from chroma_oracle.lib.move import Move
 
 
 def print_moves(moves: Iterable[Move]) -> None:

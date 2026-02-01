@@ -3,8 +3,8 @@
 import logging
 from dataclasses import dataclass
 
-from solver.lib.collection import ContainerCollection
-from solver.lib.move import Move
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.move import Move
 
 
 @dataclass
@@ -22,16 +22,18 @@ def bfs(root: ContainerCollection) -> Option | None:
         return Option(root, ())
 
     queue: list[Option] = []
+    visited: set[ContainerCollection] = {root}
     for move in root.get_moves():
         next_coll = root.after(move)
         if next_coll.is_solved:
             return Option(next_coll, (move,))
-        queue.append(Option(next_coll, (move,)))
+        if next_coll not in visited:
+            visited.add(next_coll)
+            queue.append(Option(next_coll, (move,)))
 
     while len(queue) > 0:
         logging.debug("loop %d Options %d", len(queue[0].moves), len(queue))
         next_queue: list[Option] = []
-        discovered: list[ContainerCollection] = []
         for option in queue:
             for move in option.collection.get_moves():
                 # If this move is the reverse of the previous move and the move
@@ -49,14 +51,14 @@ def bfs(root: ContainerCollection) -> Option | None:
                 if not is_solved and len(_next.get_moves()) == 0:
                     continue
                 # Check if this option has been marked as visited
-                if _next in discovered:
+                if _next in visited:
                     continue
                 moves = list(option.moves)
                 moves.append(move)
                 # Check if a solution was found
                 if is_solved:
                     return Option(_next, tuple(moves))
-                discovered.append(_next)
+                visited.add(_next)
                 next_queue.append(Option(_next, tuple(moves)))
         queue = next_queue
 

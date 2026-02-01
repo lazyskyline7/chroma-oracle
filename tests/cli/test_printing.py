@@ -1,6 +1,6 @@
-from solver.cli.printing import print_moves
-from solver.lib.collection import ContainerCollection
-from solver.lib.move import Move
+from chroma_oracle.cli.printing import print_moves
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.move import Move
 
 
 def test_print_moves_captures_lines(capsys):
@@ -31,4 +31,4 @@ def test_changed_annotation_detected():
             annotated.append(line)
 
     # Ensure at least one container line was annotated as changed
-    assert any(l.endswith(" (changed)") for l in annotated)
+    assert any(line.endswith(" (changed)") for line in annotated)

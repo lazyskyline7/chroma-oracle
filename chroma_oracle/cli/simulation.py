@@ -9,15 +9,14 @@ The function is pure (no printing) so callers can decide how to report
 results.
 """
 
-from typing import List, Optional, Tuple
 
-from solver.lib.collection import ContainerCollection
-from solver.lib.move import Move
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.move import Move
 
 
 def simulate_moves_on_grid(
-    grid: List[List[str]], moves: List[Move]
-) -> Tuple[List[List[str]], Optional[int]]:
+    grid: list[list[str]], moves: list[Move]
+) -> tuple[list[list[str]], int | None]:
     """Attempt to apply `moves` to `grid`.
 
     Args:

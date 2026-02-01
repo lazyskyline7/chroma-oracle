@@ -3,10 +3,10 @@
 import random
 from unittest import TestCase
 
-from solver.lib.collection import ContainerCollection
-from solver.lib.colour import Colour
-from solver.lib.container import Container
-from solver.lib.move import Move
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.colour import Colour
+from chroma_oracle.lib.container import Container
+from chroma_oracle.lib.move import Move
 
 colours = list(Colour)
 

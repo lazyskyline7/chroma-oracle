@@ -2,8 +2,8 @@
 
 import pathlib
 
-from solver.lib import json2collection
-from solver.lib.collection import ContainerCollection
+from chroma_oracle.lib import json2collection
+from chroma_oracle.lib.collection import ContainerCollection
 
 
 def load(path: str, reject_invalid: bool) -> ContainerCollection:

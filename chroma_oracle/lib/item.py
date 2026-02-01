@@ -1,6 +1,6 @@
 """Module representing a single coloured item."""
 
-from solver.lib.colour import Colour
+from chroma_oracle.lib.colour import Colour
 
 
 class Item:

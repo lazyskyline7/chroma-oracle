@@ -2,9 +2,9 @@
 
 from unittest import TestCase
 
-from solver.lib.colour import Colour
-from solver.lib.container import Container
-from solver.lib.item import Item
+from chroma_oracle.lib.colour import Colour
+from chroma_oracle.lib.container import Container
+from chroma_oracle.lib.item import Item
 
 
 class TestContainer(TestCase):

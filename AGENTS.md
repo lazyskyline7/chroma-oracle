@@ -30,24 +30,20 @@ Always use `uv run` to execute commands in the environment.
   ```bash
   uv run chroma-oracle strategy -i levels/mystery.json
   ```
-- **Legacy Guessing Tool** (for generating all candidates):
-  ```bash
-  uv run python -m solver.guess levels/mystery.json DFS
-  ```
 
 ### Development Commands
 - **Install/Sync Dependencies**: `uv sync`
 - **Lint (Auto-fix)**: `uv run ruff check --fix .`
 - **Format**: `uv run ruff format .`
-- **Type Check**: `uv run mypy solver`
-- **Run All Checks**: `uv run ruff check . && uv run ruff format --check . && uv run mypy solver`
+- **Type Check**: `uv run mypy chroma_oracle`
+- **Run All Checks**: `uv run ruff check . && uv run ruff format --check . && uv run mypy chroma_oracle`
 
 ## 3. Testing
 Tests are located in `tests/` and use `pytest`.
 
 - **Run All Tests**: `uv run pytest`
-- **Run Single Test File**: `uv run pytest tests/test_solver.py`
-- **Run Single Test Case**: `uv run pytest tests/test_solver.py::test_bfs_solution`
+- **Run Single Test File**: `uv run pytest tests/lib/test_search.py`
+- **Run Single Test Case**: `uv run pytest tests/lib/test_search.py::test_bfs_solution`
 
 **Testing Guidelines**:
 - Write unit tests for new logic in `tests/`.
@@ -62,7 +58,7 @@ We strictly follow the configuration in `pyproject.toml`.
 - **Line Length**: 88 characters.
 - **Quotes**: Double quotes (`"`).
 - **Indentation**: 4 spaces.
-- **Imports**: Sorted by `isort` (part of Ruff). `solver` is the known first-party package.
+- **Imports**: Sorted by `isort` (part of Ruff). `chroma_oracle` is the known first-party package.
 
 ### Type Hints (MyPy)
 - **Strictness**: `check_untyped_defs = true`.
@@ -81,10 +77,9 @@ We strictly follow the configuration in `pyproject.toml`.
 
 ## 5. Project Structure
 
-- `solver/`: Main source code.
+- `chroma_oracle/`: Main source code.
   - `cli/`: CLI command definitions (using `click`).
   - `lib/`: Core logic (state management, algorithms).
-  - `guess.py`: Entry point for mystery solver.
 - `tests/`: Pytest test suite.
 - `levels/`: Puzzle input files (JSON).
   - Format: `[["COLOR", ...], ["COLOR", ...]]` (Bottom-to-Top).

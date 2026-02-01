@@ -3,8 +3,8 @@
 import json
 from typing import TextIO
 
-# from solver.lib.container import Container
-from solver.lib.collection import ContainerCollection
+# from chroma_oracle.lib.container import Container
+from chroma_oracle.lib.collection import ContainerCollection
 
 
 def load(file: TextIO, *, reject_invalid: bool = False) -> ContainerCollection:

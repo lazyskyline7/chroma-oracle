@@ -81,17 +81,23 @@ Crack levels with hidden blocks (`UNKNOWN` or `?` in the JSON file).
 **Docker:**
 
 ```bash
-# Just add 'guess' before the file path!
-docker run --rm chroma-oracle guess levels/mystery.json DFS
+# Finds guaranteed safe moves or solves if unique solution exists
+docker run --rm chroma-oracle strategy levels/mystery.json
 ```
 
 **Local (console script):**
 
 ```bash
-uv run python -m solver.guess levels/mystery.json DFS
+uv run chroma-oracle strategy levels/mystery.json
 ```
 
-_If a solution is found, it will be saved as `levels/mystery.json.solved_X.json`. You can then run the Standard Solver on this file to see the moves._
+**Interactive Mode (Recommended):**
+
+```bash
+uv run chroma-oracle strategy -i levels/mystery.json
+```
+
+_This tool analyzes all possible hidden colors. If a unique solution is found, it solves the puzzle immediately. If not, it suggests guaranteed safe moves to reveal more clues._
 
 ## 📄 Input Format
 
@@ -155,13 +161,13 @@ uv run ruff format .
 **Type check with MyPy:**
 
 ```bash
-uv run mypy solver
+uv run mypy chroma_oracle
 ```
 
 **Run all quality checks:**
 
 ```bash
-uv run ruff check . && uv run ruff format --check . && uv run mypy solver
+uv run ruff check . && uv run ruff format --check . && uv run mypy chroma_oracle
 ```
 
 ### Dependency Management

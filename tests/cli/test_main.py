@@ -4,11 +4,11 @@ from unittest import TestCase
 
 from click.testing import CliRunner
 
-from solver.cli.main import cli
+from chroma_oracle.cli.main import cli
 
 
 class TestCli(TestCase):
-    """Unit test cases for the solver cli."""
+    """Unit test cases for the chroma_oracle cli."""
 
     def test_cli_no_arguments(self):
         """Invoke with no arguments and assert an error is raised."""
@@ -27,14 +27,22 @@ class TestCli(TestCase):
         result = runner.invoke(cli, ["--help"])
 
         self.assertEqual(result.exit_code, 0)
+        # Global help should NOT show subcommand-specific options anymore
+        self.assertFalse("-a, --algorithm" in result.output, "Global options removed")
+        self.assertTrue("--help" in result.output, "Help text should be printed")
+        self.assertTrue("solve" in result.output, "Subcommand solve should be listed")
         self.assertTrue(
-            "-a, --algorithm [bfs|dfs]" in result.output
-            or "-a, --algorithm [BFS|DFS]" in result.output,
-            "Options should be shown",
+            "strategy" in result.output, "Subcommand strategy should be listed"
         )
+
+    def test_solve_help(self):
+        """Invoke solve subcommand with help to see options."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["solve", "--help"])
+        self.assertEqual(result.exit_code, 0)
+        self.assertTrue("-a, --algorithm" in result.output, "Options should be shown")
         self.assertTrue("-v, --validate" in result.output, "Options should be shown")
         self.assertTrue("--verbose" in result.output, "Options should be shown")
-        self.assertTrue("--help" in result.output, "Help text should be printed")
 
     def test_cli_verbose(self):
         runner = CliRunner()
@@ -125,16 +133,10 @@ class TestCli(TestCase):
         import sys
 
         result = subprocess.run(
-            [sys.executable, "-m", "solver", "--help"],
+            [sys.executable, "-m", "chroma_oracle", "--help"],
             encoding="ascii",
             capture_output=True,
         )
         self.assertEqual(result.returncode, 0)
-        self.assertTrue(
-            "-a, --algorithm [bfs|dfs]" in result.stdout
-            or "-a, --algorithm [BFS|DFS]" in result.stdout,
-            "Options should be shown",
-        )
-        self.assertTrue("-v, --validate" in result.stdout, "Options should be shown")
-        self.assertTrue("--verbose" in result.stdout, "Options should be shown")
+        self.assertFalse("-a, --algorithm" in result.stdout, "Global options removed")
         self.assertTrue("--help" in result.stdout, "Help text should be printed")

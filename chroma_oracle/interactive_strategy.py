@@ -7,16 +7,16 @@ This module provides an interactive session where players:
 4. Get next set of safe moves
 5. Repeat until puzzle solved
 
-Usage: `python solver/interactive_strategy.py <json_file> [BFS|DFS]`
+Usage: `python chroma_oracle/interactive_strategy.py <json_file> [BFS|DFS]`
 """
 
 import copy
 import json
 import sys
 
-from solver.lib.collection import ContainerCollection
-from solver.lib.move import Move
-from solver.lib.strategy import find_all_solutions, find_common_prefix
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.move import Move
+from chroma_oracle.lib.strategy import find_all_solutions, find_common_prefix
 
 
 def simulate_move(grid, move):
@@ -91,7 +91,7 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
 
         if unknowns_remaining == 0:
             print("✅ No more unknowns! Puzzle fully revealed.")
-            print("You can now use the standard solver to complete it.")
+            print("You can now use the standard chroma_oracle to complete it.")
             print()
 
             try:
@@ -100,7 +100,7 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
                     print("🎉 PUZZLE ALREADY SOLVED! Congratulations!")
                 else:
                     print("Running final solve...")
-                    from solver.lib.search import bfs, dfs
+                    from chroma_oracle.lib.search import bfs, dfs
 
                     result = bfs(collection) if algorithm == "BFS" else dfs(collection)
 
@@ -146,7 +146,7 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
 
         # Check for unique solution (Eureka moment)
         if len(solutions) == 1:
-            from solver.lib.unknown_solver import identify_hidden_items
+            from chroma_oracle.lib.unknown_solver import identify_hidden_items
 
             print()
             print("=" * 70)
@@ -322,7 +322,7 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python solver/interactive_strategy.py <json_file> [BFS|DFS]")
+        print("Usage: python chroma_oracle/interactive_strategy.py <json_file> [BFS|DFS]")
         sys.exit(1)
 
     puzzle_file = sys.argv[1]

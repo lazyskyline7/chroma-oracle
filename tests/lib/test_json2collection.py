@@ -3,8 +3,8 @@
 import pathlib
 from unittest import TestCase
 
-from solver.lib import json2collection
-from solver.lib.collection import ContainerCollection
+from chroma_oracle.lib import json2collection
+from chroma_oracle.lib.collection import ContainerCollection
 
 
 class TestJson2Collection(TestCase):

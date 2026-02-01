@@ -9,10 +9,10 @@ import copy
 import itertools
 import json
 
-from solver.lib.collection import ContainerCollection
-from solver.lib.colour import Colour
-from solver.lib.move import Move
-from solver.lib.search import bfs, dfs
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.colour import Colour
+from chroma_oracle.lib.move import Move
+from chroma_oracle.lib.search import bfs, dfs
 
 
 class UnknownPuzzleData:
@@ -147,8 +147,8 @@ def identify_hidden_items(
         List of description strings (e.g., "Container 0, Item 1: RED").
     """
     identifications = []
-    for r, (row_raw, row_res) in enumerate(zip(raw_grid, resolved_grid)):
-        for c, (item_raw, item_res) in enumerate(zip(row_raw, row_res)):
+    for r, (row_raw, row_res) in enumerate(zip(raw_grid, resolved_grid, strict=True)):
+        for c, (item_raw, item_res) in enumerate(zip(row_raw, row_res, strict=True)):
             if item_raw in ("?", "UNKNOWN"):
                 identifications.append(f"Container {r}, position {c}: {item_res}")
     return identifications

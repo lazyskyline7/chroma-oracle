@@ -4,7 +4,7 @@ import json
 import os
 import tempfile
 
-from solver.lib.unknown_solver import (
+from chroma_oracle.lib.unknown_solver import (
     calculate_needed_colors,
     generate_candidate_grids,
     load_puzzle_with_unknowns,

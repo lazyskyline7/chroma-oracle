@@ -1,11 +1,10 @@
 #!/bin/sh
 set -e
 
-# Check if the first argument is 'guess'
-if [ "$1" = "guess" ]; then
+# Check if the first argument is 'interactive'
+if [ "$1" = "interactive" ]; then
     shift
-    # Run the mystery guesser
-    exec python -m solver.guess "$@"
+    exec python chroma_oracle/interactive_strategy.py "$@"
 else
     # Default: Run the standard solver
     exec python -m solver "$@"

@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from solver.lib.move import Move
+from chroma_oracle.lib.move import Move
 
 
 class TestMove(TestCase):

@@ -19,7 +19,7 @@ COPY pyproject.toml uv.lock README.md ./
 RUN uv pip install --system --no-cache -r pyproject.toml
 
 # Copy project files
-COPY solver ./solver
+COPY chroma_oracle ./chroma_oracle
 COPY levels ./levels
 COPY docker-entrypoint.sh ./
 

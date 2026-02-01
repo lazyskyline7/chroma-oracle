@@ -5,10 +5,10 @@ other parts of the codebase (CLI and interactive) can reuse the logic
 without inheriting its user-facing printing and SystemExit behaviour.
 """
 
-from solver.lib.collection import ContainerCollection
-from solver.lib.move import Move
-from solver.lib.search import bfs, dfs
-from solver.lib.unknown_solver import (
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.move import Move
+from chroma_oracle.lib.search import bfs, dfs
+from chroma_oracle.lib.unknown_solver import (
     calculate_needed_colors,
     generate_candidate_grids,
     load_puzzle_with_unknowns,

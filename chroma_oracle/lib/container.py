@@ -6,7 +6,7 @@ import collections.abc
 from collections.abc import Sequence
 from typing import Any, cast
 
-from solver.lib.item import Item
+from chroma_oracle.lib.item import Item
 
 
 class Container:
@@ -204,6 +204,10 @@ class Container:
     def __repr__(self) -> str:
         """Get a representation of the container."""
         return f"[{','.join(item.__repr__() for item in self.__data)}]"
+
+    def __hash__(self) -> int:
+        """Get the hash of this container."""
+        return hash(self.__data)
 
     def __len__(self) -> int:
         """Return the number of items contained."""

@@ -10,49 +10,19 @@ import logging
 
 import click
 
-from solver.cli.printing import print_moves
-from solver.cli.simulation import simulate_moves_on_grid
-from solver.lib import file2collection
-from solver.lib.collection import ContainerCollection
-from solver.lib.search import Option, bfs, dfs
-from solver.lib.unknown_solver import load_puzzle_with_unknowns
-from solver.lib.strategy import find_all_solutions, find_common_prefix
+from chroma_oracle.cli.printing import print_moves
+from chroma_oracle.cli.simulation import simulate_moves_on_grid
+from chroma_oracle.lib import file2collection
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.search import Option, bfs, dfs
+from chroma_oracle.lib.strategy import find_all_solutions, find_common_prefix
+from chroma_oracle.lib.unknown_solver import load_puzzle_with_unknowns
 
 
 @click.group(invoke_without_command=True)
-@click.option(
-    "-a",
-    "--algorithm",
-    type=click.Choice(["BFS", "DFS"], case_sensitive=False),
-    default="BFS",
-    show_default=True,
-    help="Select which algorithm to use to solve the PUZZLE.",
-)
-@click.option(
-    "-v",
-    "--validate",
-    is_flag=True,
-    help="Ensure PUZZLE is valid and return an error if not.",
-)
-@click.option(
-    "--verbose",
-    is_flag=True,
-    help="Show additional logging whilst running BFS search",
-)
 @click.pass_context
-def cli(
-    ctx: click.Context,
-    algorithm: str = "BFS",
-    verbose: bool = False,
-    validate: bool = False,
-) -> None:
+def cli(ctx: click.Context) -> None:
     ctx.ensure_object(dict)
-    ctx.obj["algorithm"] = algorithm
-    ctx.obj["validate"] = validate
-    ctx.obj["verbose"] = verbose
-
-    if verbose:
-        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
     if ctx.invoked_subcommand is not None:
         return
@@ -61,7 +31,7 @@ def cli(
     ctx.exit()
 
 
-@cli.command(name="solve")
+@cli.command()
 @click.argument("puzzle", type=click.Path(exists=True))
 @click.option(
     "-a",
@@ -129,10 +99,18 @@ def solve(puzzle: str, algorithm: str, validate: bool, verbose: bool) -> None:
     show_default=True,
     help="Select which algorithm to use.",
 )
-def strategy(puzzle: str, interactive: bool, algorithm: str):
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Show additional logging whilst running BFS search",
+)
+def strategy(puzzle: str, interactive: bool, algorithm: str, verbose: bool):
     """Calculate winning strategy or run interactive session."""
+    if verbose:
+        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+
     if interactive:
-        from solver.interactive_strategy import interactive_strategy_session
+        from chroma_oracle.interactive_strategy import interactive_strategy_session
 
         interactive_strategy_session(puzzle, algorithm)
         return
@@ -161,7 +139,7 @@ def strategy(puzzle: str, interactive: bool, algorithm: str):
 
     # Check for unique solution (Eureka moment)
     if len(solutions) == 1:
-        from solver.lib.unknown_solver import identify_hidden_items
+        from chroma_oracle.lib.unknown_solver import identify_hidden_items
 
         print(f"\nFound {len(solutions)} winning paths.")
         print("✨ MYSTERY SOLVED! Only one valid solution exists.")

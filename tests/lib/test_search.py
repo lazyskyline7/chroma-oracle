@@ -2,9 +2,9 @@
 
 from unittest import TestCase
 
-from solver.lib import search
-from solver.lib.collection import ContainerCollection
-from solver.lib.move import Move
+from chroma_oracle.lib import search
+from chroma_oracle.lib.collection import ContainerCollection
+from chroma_oracle.lib.move import Move
 
 
 class TestSearch(TestCase):
