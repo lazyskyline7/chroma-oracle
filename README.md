@@ -1,200 +1,128 @@
 # ChromaOracle 🔮
+[![Docker Pulls](https://img.shields.io/docker/pulls/lazyskyline/chroma-oracle)](https://hub.docker.com/repository/docker/lazyskyline/chroma-oracle)
+[![Tests](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
+[![Docker Publish](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml)
+[![ruff/mypy](https://img.shields.io/github/actions/workflow/status/lazyskyline7/chroma-oracle/tests.yml?label=ruff%2Fmypy%20checks)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
 
-A powerful CLI tool to solve colour sorting puzzle games (like Ball Sort Puzzle, Water Sort Puzzle) using Breadth-First Search (BFS) and Depth-First Search (DFS) algorithms.
+CLI for solving colour sorting puzzles (Ball Sort, Water Sort, etc.) using BFS/DFS plus a mystery solver that infers hidden colours. Run it via `uv run chroma-oracle` or the Docker image below.
 
-It features a unique **Mystery Guesser** to crack levels with hidden "unseen" blocks 🕵️‍♀️.
+## Quick start
 
-This project is modernized to use **Python 3.13+** and **uv** for blazing fast dependency management, and includes full **Docker** support.
+### Run from source
 
-## ✨ Features
-
-- **Optimal Solving:** Uses BFS to find the shortest possible path to victory.
-- **Fast Search:** Uses DFS to find _any_ solution quickly for complex levels.
-- **Mystery Solver:** Can deduce hidden colors (marked as `?` or `UNKNOWN`) by simulating all valid permutations.
-- **Dockerized:** Run anywhere without installing Python locally.
-
-## 🚀 Installation
-
-### Option A: Docker (Recommended)
-
-No need to install Python or dependencies!
-
-1.  **Build the image:**
-    ```bash
-    docker build -t chroma-oracle .
-    ```
-
-You can run the image in a way that any files the container writes are persisted
-to your current working directory (so `levels/..._solved` appears on the host).
-Use the provided wrapper script:
-
-```
-./scripts/docker-run.sh chroma-oracle guess levels/level9.json DFS
-```
-
-This mounts `$(pwd)` into the container at `/app` and runs the command so
-outputs are written to your host tree by default.
-
-### Option B: Local Development
-
-Requires [uv](https://github.com/astral-sh/uv).
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/lazyskyline7/chroma-oracle.git
-    cd chroma-oracle
-    ```
-
-2.  **Sync Dependencies:**
-    ```bash
-    uv sync
-    ```
-
-## 🛠️ Usage
-
-### 1. Standard Solver 🧩
-
-Solve a level where all colors are known.
-
-**Docker:**
+Requires **Python 3.13+**.
 
 ```bash
-docker run --rm chroma-oracle levels/simple_shows_differences.json
+git clone https://github.com/lazyskyline7/chroma-oracle.git
+cd chroma-oracle
+uv sync
+uv run chroma-oracle solve levels/simple_shows_differences.json
 ```
 
-**Local (console script):**
+### Docker (alternative)
+
+```
+docker build -t chroma-oracle .
+docker tag chroma-oracle:latest lazyskyline/chroma-oracle:latest
+docker push lazyskyline/chroma-oracle:latest
+```
+
+Once the image is on Docker Hub you can pull it anywhere:
+
+```
+docker run --rm lazyskyline/chroma-oracle:latest levels/simple_shows_differences.json
+```
+
+Use `./scripts/docker-run.sh chroma-oracle ...` to mount your working tree into `/app` and forward any CLI arguments whenever you build locally.
+
+## Features ✨
+
+- **Optimal solving:** BFS finds the shortest move sequence.
+- **Fast search:** DFS reaches a valid solution quickly for deeper puzzles.
+- **Mystery solver:** Handles `UNKNOWN`/`?` entries by simulating every consistent fill and exposing guaranteed, safe moves.
+- **Lightweight CLI:** Works via `pip`, `uv run`, or Docker with the same subcommands.
+- **Interactive strategy:** Step through guaranteed moves, reveal hidden colours, and update levels iteratively.
+
+## Usage
+
+### Solve known puzzles 🧩
 
 ```bash
-uv run chroma-oracle levels/simple_shows_differences.json
+chroma-oracle solve levels/simple_shows_differences.json
 ```
 
-**Options:**
+The `solve` command prints the starting stacks, executes the chosen algorithm, and lists the solution or an explanation when no solution exists.
 
-- `-a, --algorithm [BFS|DFS]`: Choose algorithm (Default: BFS).
-- `--verbose`: Enable debug logging.
-
-### 2. Mystery Guesser 🕵️‍♂️
-
-Crack levels with hidden blocks (`UNKNOWN` or `?` in the JSON file).
-
-**Docker:**
+### Mystery solving & strategy 🕵️‍♂️
 
 ```bash
-# Finds guaranteed safe moves or solves if unique solution exists
-docker run --rm chroma-oracle strategy levels/mystery.json
+chroma-oracle strategy levels/mystery.json
+chroma-oracle strategy -i levels/mystery.json
 ```
 
-**Local (console script):**
+`strategy` computes all candidate solutions for puzzles containing hidden cells and reports any prefix shared by every candidate, i.e., guaranteed safe moves. Pass `-i` for an interactive session that applies one move at a time so you can update the level file between steps.
 
-```bash
-uv run chroma-oracle strategy levels/mystery.json
-```
+## Algorithms 🧠
 
-**Interactive Mode (Recommended):**
+- **Breadth-first search (BFS):** Guaranteed optimal (fewest moves) traversal of the puzzle graph.
+- **Depth-first search (DFS):** Fast exploration for large puzzles where speed matters more than minimality.
+- **Mystery handling:** Unknown slots are filled with every consistent colour arrangement; `find_all_solutions` and `find_common_prefix` extract the safe moves.
 
-```bash
-uv run chroma-oracle strategy -i levels/mystery.json
-```
+## CLI reference
 
-_This tool analyzes all possible hidden colors. If a unique solution is found, it solves the puzzle immediately. If not, it suggests guaranteed safe moves to reveal more clues._
+| Flag | Description |
+| --- | --- |
+| `-a, --algorithm [BFS|DFS]` | Select the search strategy (default: BFS). |
+| `--verbose` | Enable extra logging from BFS/DFS or strategy helpers. |
+| `-i, --interactive` | (strategy only) Run an interactive session that pauses between guaranteed moves. |
+| `--help` | Show the CLI help text. |
 
-## 📄 Input Format
+## Input format 📄
 
-Levels are defined in JSON files as a list of lists.
-
-- **Order:** Items are listed from **BOTTOM to TOP**.
-- **Colors:** Must match valid color names.
-
-**Example `level.json`:**
+Levels are JSON files where each container is a list of colours from **bottom to top**. Unknown colours are represented as `"?"` or `"UNKNOWN"`.
 
 ```json
 [
-  ["RED", "BLUE", "GREEN", "RED"], // Container 1: Red at bottom
-  ["BLUE", "RED", "GREEN", "UNKNOWN"], // Container 2: Top item hidden
-  [], // Empty Container
-  [] // Empty Container
+  ["RED", "BLUE", "GREEN", "RED"],
+  ["BLUE", "RED", "GREEN", "UNKNOWN"],
+  [],
+  []
 ]
 ```
 
-**Supported Colors:**
-`RED`, `PINK`, `BROWN`, `GREEN`, `LIGHT_GREEN`, `DARK_GREEN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `DARK_BLUE`, `GREY` (use for White), `PURPLE`, `ORANGE`.
+Supported colours: `RED`, `PINK`, `BROWN`, `GREEN`, `LIGHT_GREEN`, `DARK_GREEN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `DARK_BLUE`, `GREY`, `PURPLE`, `ORANGE`.
 
-## 🧠 Algorithms
+## Docker Hub image
 
-### Breadth-First Search (BFS)
+After pushing `lazyskyline/chroma-oracle`, the published image can be referenced directly:
 
-The BFS algorithm is designed to find the **optimal solution** (fewest moves).
+```
+docker pull lazyskyline/chroma-oracle:latest
+docker run --rm lazyskyline/chroma-oracle:latest strategy levels/mystery.json
+```
 
-- **How it works:** It evaluates the starting pattern to find all possible moves, creating a "queue" of next patterns. It then evaluates each pattern layer by layer.
-- **Trade-off:** This guarantees the shortest path but can be slower and memory-intensive for very deep puzzles.
+Setup automated builds by linking `github.com/lazyskyline7/chroma-oracle` to Docker Hub so that every push keeps the badge above fresh.
 
-### Depth-First Search (DFS)
+## Automation
 
-The DFS algorithm prioritizes **speed**.
+- `Tests` workflow (`.github/workflows/tests.yml`) runs on pushes and pull requests targeting `main`, covering Ruff, formatting, MyPy, and Pytest checks.
+- `Docker Publish` workflow (`.github/workflows/docker-publish.yml`) runs on pushes to `main`, logs into Docker Hub with `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN` secrets, and pushes `lazyskyline/chroma-oracle:latest`.
 
-- **How it works:** It explores a single path of moves as far as possible (down the tree) before backtracking if it hits a dead end.
-- **Trade-off:** It finds _a_ solution much faster than BFS, but the solution is often not the shortest (e.g., it might take 50 moves to do what BFS does in 20).
-
-## 🧪 Development
-
-### Running Tests
+## Developer helpers 🧪
 
 ```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy chroma_oracle
 uv run pytest
 ```
 
-### Code Quality
+Add new runtime dependencies via `uv add <package>` and dev dependencies via `uv add --dev <package>`. Update the lockfile with `uv lock --upgrade && uv sync` when you change dependencies.
 
-**Lint and auto-fix with Ruff:**
+## Contributing
 
-```bash
-uv run ruff check --fix .
-```
+Bug reports and pull requests are welcome. Follow the existing style: double-quoted strings, 88-column Ruff rules, and strict MyPy annotations.
 
-**Format code with Ruff:**
+## License
 
-```bash
-uv run ruff format .
-```
-
-**Type check with MyPy:**
-
-```bash
-uv run mypy chroma_oracle
-```
-
-**Run all quality checks:**
-
-```bash
-uv run ruff check . && uv run ruff format --check . && uv run mypy chroma_oracle
-```
-
-### Dependency Management
-
-**Add a runtime dependency:**
-
-```bash
-uv add <package-name>
-```
-
-**Add a development dependency:**
-
-```bash
-uv add --dev <package-name>
-```
-
-**Update all dependencies:**
-
-```bash
-uv lock --upgrade
-uv sync
-```
-
-All dependencies are defined in `pyproject.toml` and locked in 
-`uv.lock`. The old `requirements/` directory has been removed in 
-favor of modern PEP 735 dependency groups.
-
-## 📝 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+MIT. See `LICENSE`.

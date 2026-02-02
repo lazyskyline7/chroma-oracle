@@ -322,7 +322,9 @@ def interactive_strategy_session(puzzle_path: str, algorithm: str = "BFS"):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python chroma_oracle/interactive_strategy.py <json_file> [BFS|DFS]")
+        print(
+            "Usage: python chroma_oracle/interactive_strategy.py <json_file> [BFS|DFS]"
+        )
         sys.exit(1)
 
     puzzle_file = sys.argv[1]

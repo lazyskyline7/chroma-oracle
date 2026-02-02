@@ -9,7 +9,6 @@ The function is pure (no printing) so callers can decide how to report
 results.
 """
 
-
 from chroma_oracle.lib.collection import ContainerCollection
 from chroma_oracle.lib.move import Move
 

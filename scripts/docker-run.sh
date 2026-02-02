@@ -8,7 +8,7 @@ set -euo pipefail
 IMAGE_NAME=${1:-chroma-oracle}
 shift || true
 
-# If first arg looks like a subcommand (e.g., guess), keep it. Allow passing
+# If first arg looks like a subcommand, keep it. Allow passing
 # arbitrary docker run flags by setting DOCKER_RUN_FLAGS env if needed.
 
 PWD_HOST="$(pwd)"
