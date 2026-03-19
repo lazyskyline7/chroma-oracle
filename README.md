@@ -4,6 +4,10 @@
 [![Docker Publish](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml)
 [![ruff/mypy](https://img.shields.io/github/actions/workflow/status/lazyskyline7/chroma-oracle/tests.yml?label=ruff%2Fmypy%20checks)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
 
+**🌐 Play the web version now at [chromaoracle.com](https://chromaoracle.com)!**
+
+[![ChromaOracle Web Version](assets/hero.png)](https://chromaoracle.com)
+
 CLI for solving colour sorting puzzles (Ball Sort, Water Sort, etc.) using BFS/DFS plus a mystery solver that infers hidden colours. Run it via `uv run chroma-oracle` or the Docker image below.
 
 ## Quick start
@@ -42,6 +46,8 @@ Use `./scripts/docker-run.sh chroma-oracle ...` to mount your working tree into 
 - **Mystery solver:** Handles `UNKNOWN`/`?` entries by simulating every consistent fill and exposing guaranteed, safe moves.
 - **Lightweight CLI:** Works via `pip`, `uv run`, or Docker with the same subcommands.
 - **Interactive strategy:** Step through guaranteed moves, reveal hidden colours, and update levels iteratively.
+
+![ChromaOracle Solver UI](assets/solver.png)
 
 ## Usage
 
