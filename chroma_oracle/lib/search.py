@@ -15,51 +15,84 @@ class Option:
     moves: tuple[Move, ...]
 
 
+@dataclass
+class BfsNode:
+    """Represents a node in the BFS search tree."""
+
+    collection: ContainerCollection
+    move: Move | None
+    parent: BfsNode | None
+    prev_move: Move | None = None
+    prev_prev_move: Move | None = None
+
+
+def reconstruct_path(node: BfsNode) -> tuple[Move, ...]:
+    """Reconstruct the path of moves from root to node."""
+    moves = []
+    current: BfsNode | None = node
+    while current and current.move:
+        moves.append(current.move)
+        current = current.parent
+    return tuple(reversed(moves))
+
+
 def bfs(root: ContainerCollection) -> Option | None:
     """Perform a Breadth-first search to find an optimal solution."""
     # Ensure the search is required
     if root.is_solved:
         return Option(root, ())
 
-    queue: list[Option] = []
+    root_node = BfsNode(root, None, None)
+    queue: list[BfsNode] = []
     visited: set[ContainerCollection] = {root}
+
     for move in root.get_moves():
         next_coll = root.after(move)
         if next_coll.is_solved:
             return Option(next_coll, (move,))
         if next_coll not in visited:
             visited.add(next_coll)
-            queue.append(Option(next_coll, (move,)))
+            queue.append(BfsNode(next_coll, move, root_node, move, None))
 
     while len(queue) > 0:
-        logging.debug("loop %d Options %d", len(queue[0].moves), len(queue))
-        next_queue: list[Option] = []
-        for option in queue:
-            for move in option.collection.get_moves():
-                # If this move is the reverse of the previous move and the move
-                # before that was this move, a loop has been found and needs to
-                # be broken by simply ignoring this move.
+        logging.debug("Options %d", len(queue))
+        next_queue: list[BfsNode] = []
+        for node in queue:
+            for move in node.collection.get_moves():
+                # Detect trivial loops: A→B then B→A then A→B again
                 if (
-                    len(option.moves) > 1
-                    and option.moves[-1] == move.reverse()
-                    and option.moves[-2] == move
+                    node.prev_move is not None
+                    and node.prev_prev_move is not None
+                    and node.prev_move == move.reverse()
+                    and node.prev_prev_move == move
                 ):
                     continue
-                _next: ContainerCollection = option.collection.after(move)
-                is_solved = _next.is_solved
-                # If this is a leaf node, we cannot continue our search
-                if not is_solved and len(_next.get_moves()) == 0:
-                    continue
-                # Check if this option has been marked as visited
+
+                _next: ContainerCollection = node.collection.after(move)
+
+                # Performance: Check visited before expensive state analysis
                 if _next in visited:
                     continue
-                moves = list(option.moves)
-                moves.append(move)
+
+                is_solved = _next.is_solved
+                # Skip dead-end states (no moves and not solved)
+                if not is_solved and not _next.get_moves():
+                    continue
+
+                child_node = BfsNode(
+                    _next,
+                    move,
+                    node,
+                    prev_move=move,
+                    prev_prev_move=node.prev_move,
+                )
+
                 # Check if a solution was found
                 if is_solved:
-                    return Option(_next, tuple(moves))
+                    return Option(_next, reconstruct_path(child_node))
+
                 visited.add(_next)
-                next_queue.append(Option(_next, tuple(moves)))
+                next_queue.append(child_node)
         queue = next_queue
 
     # No valid options
@@ -72,16 +105,16 @@ def dfs(root: ContainerCollection) -> Option | None:
     if root.is_solved:
         return Option(root, ())
 
-    visited: list[ContainerCollection] = []
+    visited: set[ContainerCollection] = set()
     # Call the recursive function
     return _dfs(visited, Option(root, ()))
 
 
-def _dfs(visited: list[ContainerCollection], option: Option) -> Option | None:
+def _dfs(visited: set[ContainerCollection], option: Option) -> Option | None:
     col = option.collection
     if col in visited:
         return None
-    visited.append(col)
+    visited.add(col)
     if col.is_solved:
         return option
 
