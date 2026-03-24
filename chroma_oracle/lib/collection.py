@@ -11,15 +11,24 @@ class ContainerCollection:
 
     def __init__(
         self,
-        data: ContainerCollection | list[Container] | list[list[str]],
+        data: ContainerCollection | list[Container] | list[list[str]] | tuple[Container, ...],
     ):
         """Construct a new collection from `data`."""
-        self.__unique_set: set | None = None
+        self.__unique_set: set[tuple[Item, ...]] | None = None
         self.__possible_moves: list[Move] | None = None
+        self._is_solved: bool | None = None
+
         if isinstance(data, list):
-            self.data = tuple(Container(item) for item in data)
+            if data and isinstance(data[0], Container):
+                self.data = tuple(data)  # type: ignore
+            else:
+                self.data = tuple(Container(item) for item in data)
+        elif isinstance(data, tuple):
+            self.data = data
         elif isinstance(data, ContainerCollection):
-            self.data = tuple(container.copy() for container in data.data)
+            # Since containers are now immutable, we can just share the tuple
+            self.data = data.data
+            self._is_solved = data._is_solved
         else:
             raise TypeError(
                 f"Invalid type ({data.__class__.__name__}) "
@@ -29,7 +38,10 @@ class ContainerCollection:
     @property
     def is_solved(self) -> bool:
         """Check if all containers are solved."""
-        return all(container.is_solved for container in self.data)
+        if self._is_solved is not None:
+            return self._is_solved
+        self._is_solved = all(container.is_solved for container in self.data)
+        return self._is_solved
 
     # work out all possible next moves:
     def get_moves(self) -> list[Move]:
@@ -98,11 +110,21 @@ class ContainerCollection:
         """Get a new collection with `move` having been made."""
         if not self.is_valid(move):
             raise ValueError("Invalid move", move)
-        _next = ContainerCollection(self)
-        _next.data[move.src].pour(_next.data[move.dest])
-        return _next
 
-    def __getitem__(self, x):
+        src_container = self.data[move.src]
+        dest_container = self.data[move.dest]
+
+        new_src, items = src_container.popped()
+        new_dest = dest_container.pushed(items)
+
+        # Efficiently create new tuple by reusing unchanged containers
+        new_containers = list(self.data)
+        new_containers[move.src] = new_src
+        new_containers[move.dest] = new_dest
+
+        return ContainerCollection(tuple(new_containers))
+
+    def __getitem__(self, x: int):
         """Get item for this index."""
         return self.data[x]
 
@@ -110,7 +132,7 @@ class ContainerCollection:
         """Get the number of containers in the collection."""
         return len(self.data)
 
-    def _unique_set(self):
+    def _unique_set(self) -> set[tuple[Item, ...]]:
         """Get the set representing the unique containers in the collection.
 
         This set is cached to improve performance of comparing collections
