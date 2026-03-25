@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from chroma_oracle.lib.container import Container
+from chroma_oracle.lib.item import Item
 from chroma_oracle.lib.move import Move
 
 
@@ -11,9 +12,13 @@ class ContainerCollection:
 
     def __init__(
         self,
-        data: ContainerCollection | list[Container] | list[list[str]] | tuple[Container, ...],
+        data: ContainerCollection
+        | list[Container]
+        | list[list[str]]
+        | tuple[Container, ...],
     ):
         """Construct a new collection from `data`."""
+        self.data: tuple[Container, ...]
         self.__unique_set: set[tuple[Item, ...]] | None = None
         self.__possible_moves: list[Move] | None = None
         self._is_solved: bool | None = None

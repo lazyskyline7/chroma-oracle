@@ -38,7 +38,9 @@ class Container:
         else:
             type_map = set(map(type, iter(initial_content)))
             if type_map == {Item}:
-                initial_content = cast(Sequence[Item], initial_content[: self._capacity])
+                initial_content = cast(
+                    Sequence[Item], initial_content[: self._capacity]
+                )
                 self.__data = tuple(initial_content)
             elif type_map == {str}:
                 initial_content = cast(Sequence[str], initial_content[: self._capacity])
@@ -191,7 +193,7 @@ class Container:
             return False
 
         items_to_move = list(self.__data[-num_to_move:])
-        
+
         # Mutate the existing instances for compatibility
         self.__data = self.__data[:-num_to_move]
         # We can't use target.pushed here because it creates a new instance
