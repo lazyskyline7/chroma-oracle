@@ -1,4 +1,5 @@
 # ChromaOracle 🔮
+
 [![Docker Pulls](https://img.shields.io/docker/pulls/lazyskyline/chroma-oracle)](https://hub.docker.com/repository/docker/lazyskyline/chroma-oracle)
 [![Tests](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
 [![Docker Publish](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml)
@@ -8,7 +9,7 @@
 
 [![ChromaOracle Web Version](assets/hero.png)](https://chromaoracle.com)
 
-CLI for solving colour sorting puzzles (Ball Sort, Water Sort, etc.) using BFS/DFS plus a mystery solver that infers hidden colours. Run it via `uv run chroma-oracle` or the Docker image below.
+ChromaOracle is a powerful solver for color sorting puzzles (Ball Sort, Water Sort, etc.) available as both a high-performance CLI and a modern web application. It uses BFS/DFS alongside a mystery solver to infer hidden colors. Run the CLI via `uv run chroma-oracle` or try the interactive web version.
 
 ## Quick start
 
@@ -47,8 +48,6 @@ Use `./scripts/docker-run.sh chroma-oracle ...` to mount your working tree into 
 - **Lightweight CLI:** Works via `pip`, `uv run`, or Docker with the same subcommands.
 - **Interactive strategy:** Step through guaranteed moves, reveal hidden colours, and update levels iteratively.
 
-![ChromaOracle Solver UI](assets/solver.png)
-
 ## Usage
 
 ### Solve known puzzles 🧩
@@ -76,24 +75,19 @@ chroma-oracle strategy -i levels/mystery.json
 
 ## CLI reference
 
-| Flag | Description |
-| --- | --- |
-| `-a, --algorithm [BFS|DFS]` | Select the search strategy (default: BFS). |
-| `--verbose` | Enable extra logging from BFS/DFS or strategy helpers. |
-| `-i, --interactive` | (strategy only) Run an interactive session that pauses between guaranteed moves. |
-| `--help` | Show the CLI help text. |
+| Flag                  | Description                                                                      |
+| --------------------- | -------------------------------------------------------------------------------- | ------------------------------------------ |
+| `-a, --algorithm [BFS | DFS]`                                                                            | Select the search strategy (default: BFS). |
+| `--verbose`           | Enable extra logging from BFS/DFS or strategy helpers.                           |
+| `-i, --interactive`   | (strategy only) Run an interactive session that pauses between guaranteed moves. |
+| `--help`              | Show the CLI help text.                                                          |
 
 ## Input format 📄
 
 Levels are JSON files where each container is a list of colours from **bottom to top**. Unknown colours are represented as `"?"` or `"UNKNOWN"`.
 
 ```json
-[
-  ["RED", "BLUE", "GREEN", "RED"],
-  ["BLUE", "RED", "GREEN", "UNKNOWN"],
-  [],
-  []
-]
+[["RED", "BLUE", "GREEN", "RED"], ["BLUE", "RED", "GREEN", "UNKNOWN"], [], []]
 ```
 
 Supported colours: `RED`, `PINK`, `BROWN`, `GREEN`, `LIGHT_GREEN`, `DARK_GREEN`, `YELLOW`, `BLUE`, `LIGHT_BLUE`, `DARK_BLUE`, `GREY`, `PURPLE`, `ORANGE`.
