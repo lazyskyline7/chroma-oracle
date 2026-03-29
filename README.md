@@ -1,9 +1,11 @@
 # ChromaOracle 🔮
 
+[![Version](https://img.shields.io/badge/version-2.1.0-orange)](https://github.com/lazyskyline7/chroma-oracle)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lazyskyline/chroma-oracle)](https://hub.docker.com/repository/docker/lazyskyline/chroma-oracle)
 [![Tests](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
 [![Docker Publish](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml)
 [![ruff/mypy](https://img.shields.io/github/actions/workflow/status/lazyskyline7/chroma-oracle/tests.yml?label=ruff%2Fmypy%20checks)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **🌐 Play the web version now at [chromaoracle.com](https://chromaoracle.com)!**
 
