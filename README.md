@@ -1,10 +1,10 @@
 # ChromaOracle 🔮
 
-[![Version](https://img.shields.io/badge/version-2.1.0-orange)](https://github.com/lazyskyline7/chroma-oracle)
-[![Docker Pulls](https://img.shields.io/docker/pulls/lazyskyline/chroma-oracle)](https://hub.docker.com/repository/docker/lazyskyline/chroma-oracle)
-[![Tests](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
-[![Docker Publish](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/docker-publish.yml)
-[![ruff/mypy](https://img.shields.io/github/actions/workflow/status/lazyskyline7/chroma-oracle/tests.yml?label=ruff%2Fmypy%20checks)](https://github.com/lazyskyline7/chroma-oracle/actions/workflows/tests.yml)
+[![Version](https://img.shields.io/badge/version-2.1.0-orange)](https://github.com/klhq/chroma-oracle)
+[![Docker Pulls](https://img.shields.io/docker/pulls/klhq/chroma-oracle)](https://hub.docker.com/repository/docker/klhq/chroma-oracle)
+[![Tests](https://github.com/klhq/chroma-oracle/actions/workflows/tests.yml/badge.svg)](https://github.com/klhq/chroma-oracle/actions/workflows/tests.yml)
+[![Docker Publish](https://github.com/klhq/chroma-oracle/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/klhq/chroma-oracle/actions/workflows/docker-publish.yml)
+[![ruff/mypy](https://img.shields.io/github/actions/workflow/status/klhq/chroma-oracle/tests.yml?label=ruff%2Fmypy%20checks)](https://github.com/klhq/chroma-oracle/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **🌐 Play the web version now at [chromaoracle.com](https://chromaoracle.com?utm_source=github&utm_medium=referral&utm_campaign==python_repo_readme)!**
@@ -20,7 +20,7 @@ ChromaOracle is a powerful solver for color sorting puzzles (Ball Sort, Water So
 Requires **Python 3.13+**.
 
 ```bash
-git clone https://github.com/lazyskyline7/chroma-oracle.git
+git clone https://github.com/klhq/chroma-oracle.git
 cd chroma-oracle
 uv sync
 uv run chroma-oracle solve levels/simple_shows_differences.json
@@ -30,14 +30,14 @@ uv run chroma-oracle solve levels/simple_shows_differences.json
 
 ```
 docker build -t chroma-oracle .
-docker tag chroma-oracle:latest lazyskyline/chroma-oracle:latest
-docker push lazyskyline/chroma-oracle:latest
+docker tag chroma-oracle:latest klhq/chroma-oracle:latest
+docker push klhq/chroma-oracle:latest
 ```
 
 Once the image is on Docker Hub you can pull it anywhere:
 
 ```
-docker run --rm lazyskyline/chroma-oracle:latest levels/simple_shows_differences.json
+docker run --rm klhq/chroma-oracle:latest levels/simple_shows_differences.json
 ```
 
 Use `./scripts/docker-run.sh chroma-oracle ...` to mount your working tree into `/app` and forward any CLI arguments whenever you build locally.
@@ -71,7 +71,7 @@ chroma-oracle strategy -i levels/mystery.json
 
 ## Algorithms 🧠
 
-- **Breadth-first search (BFS):** Guaranteed optimal (fewest moves) traversal of the puzzle graph.
+- **Breadth-first search (BFS):** Guaranteed optimal (fewest moves) traversal of the puzzle graph, with immediate undo moves pruned before expansion for faster search.
 - **Depth-first search (DFS):** Fast exploration for large puzzles where speed matters more than minimality.
 - **Mystery handling:** Unknown slots are filled with every consistent colour arrangement; `find_all_solutions` and `find_common_prefix` extract the safe moves.
 
@@ -96,19 +96,19 @@ Supported colours: `RED`, `PINK`, `BROWN`, `GREEN`, `LIGHT_GREEN`, `DARK_GREEN`,
 
 ## Docker Hub image
 
-After pushing `lazyskyline/chroma-oracle`, the published image can be referenced directly:
+After pushing `klhq/chroma-oracle`, the published image can be referenced directly:
 
 ```
-docker pull lazyskyline/chroma-oracle:latest
-docker run --rm lazyskyline/chroma-oracle:latest strategy levels/mystery.json
+docker pull klhq/chroma-oracle:latest
+docker run --rm klhq/chroma-oracle:latest strategy levels/mystery.json
 ```
 
-Setup automated builds by linking `github.com/lazyskyline7/chroma-oracle` to Docker Hub so that every push keeps the badge above fresh.
+Setup automated builds by linking `github.com/klhq/chroma-oracle` to Docker Hub so that every push keeps the badge above fresh.
 
 ## Automation
 
 - `Tests` workflow (`.github/workflows/tests.yml`) runs on pushes and pull requests targeting `main`, covering Ruff, formatting, MyPy, and Pytest checks.
-- `Docker Publish` workflow (`.github/workflows/docker-publish.yml`) runs on pushes to `main`, logs into Docker Hub with `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN` secrets, and pushes `lazyskyline/chroma-oracle:latest`.
+- `Docker Publish` workflow (`.github/workflows/docker-publish.yml`) runs on pushes to `main`, logs into Docker Hub with `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN` secrets, and pushes `klhq/chroma-oracle:latest`.
 
 ## Developer helpers 🧪
 
